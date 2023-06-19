@@ -20,27 +20,35 @@
 <body>
   <h1>Simulado</h1>
 
+  <div id="themes-container"></div>
+
+  <button onclick="checkAnswers()">Enviar</button>
+  <p id="result-message"></p>
+
   <script>
     // Função para ler o arquivo CSV
     function readCSVFile(file, delimiter) {
       return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const contents = event.target.result;
-          const lines = contents.split('\n');
-          const data = lines.map(line => line.split(delimiter));
-          resolve(data);
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', file, true);
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            const contents = xhr.responseText;
+            const lines = contents.split('\n');
+            const data = lines.map(line => line.split(delimiter));
+            resolve(data);
+          }
         };
-        reader.onerror = (event) => {
-          reject(event.target.error);
+        xhr.onerror = () => {
+          reject(xhr.statusText);
         };
-        reader.readAsText(file);
+        xhr.send();
       });
     }
 
     // Função para exibir as perguntas na página
     function displayQuestions(questions) {
-      const container = document.getElementById('questions-container');
+      const container = document.getElementById('themes-container');
       container.innerHTML = '';
 
       questions.forEach((question, index) => {
@@ -163,10 +171,5 @@
 
     document.addEventListener('DOMContentLoaded', loadApplication);
   </script>
-
-  <div id="themes-container"></div>
-
-  <button onclick="checkAnswers()">Enviar</button>
-  <p id="result-message"></p>
 </body>
 </html>
