@@ -109,7 +109,7 @@
       }
 
       const resultMessage = document.getElementById('result-message');
-      const percentage = (correctCount / questions.length) * 100;
+      const percentage = (correctCount / document.querySelectorAll('.question input[type="radio"]:checked').length) * 100;
       resultMessage.textContent = `Você acertou ${correctCount} de ${questions.length} (${percentage.toFixed(2)}%)`;
     }
 
