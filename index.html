@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Simulado</title>
   <style>
     .question {
       margin-bottom: 10px;
     }
+
     .correct {
       color: green;
     }
+
     .incorrect {
       color: red;
     }
@@ -16,92 +19,154 @@
 </head>
 <body>
   <h1>Simulado</h1>
-  <div id="questions"></div>
-  <button onclick="evaluateAnswers()">Enviar</button>
 
   <script>
-    // Função para ler um arquivo CSV
-    function parseCSV(csvContent) {
-      const rows = csvContent.trim().split('\n');
-      const headers = rows.shift().split(';');
-      return rows.map(row => {
-        const values = row.split(';');
-        const entry = {};
-        headers.forEach((header, index) => {
-          entry[header] = values[index];
-        });
-        return entry;
+    // Função para ler o arquivo CSV
+    function readCSVFile(file, delimiter) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const contents = event.target.result;
+          const lines = contents.split('\n');
+          const data = lines.map(line => line.split(delimiter));
+          resolve(data);
+        };
+        reader.onerror = (event) => {
+          reject(event.target.error);
+        };
+        reader.readAsText(file);
       });
     }
 
-    // Função para criar uma div de pergunta
-    function createQuestionDiv(question, index) {
-      const questionDiv = document.createElement('div');
-      questionDiv.classList.add('question');
-      questionDiv.innerHTML = `
-        <h3>Pergunta ${index + 1}</h3>
-        <p>${question.pergunta}</p>
-        <label>
-          <input type="radio" name="question-${index}" value="0"> ZERO
-        </label>
-        <label>
-          <input type="radio" name="question-${index}" value="1"> UM
-        </label>
-      `;
-      return questionDiv;
-    }
-
-    // Função para avaliar as respostas e exibir o resultado
-    function evaluateAnswers() {
-      const questions = document.querySelectorAll('.question');
-      let correctCount = 0;
+    // Função para exibir as perguntas na página
+    function displayQuestions(questions) {
+      const container = document.getElementById('questions-container');
+      container.innerHTML = '';
 
       questions.forEach((question, index) => {
-        const selectedOption = question.querySelector(`input[name="question-${index}"]:checked`);
-        const answer = parseInt(selectedOption.value);
-        const isCorrect = (answer === parseInt(question.dataset.answer));
-        if (isCorrect) {
-          question.classList.add('correct');
-          correctCount++;
-        } else {
-          question.classList.add('incorrect');
-        }
-      });
+        const div = document.createElement('div');
+        div.classList.add('question');
 
-      const percentage = (correctCount / questions.length) * 100;
-      alert(`Você acertou ${correctCount} de ${questions.length} (${percentage.toFixed(2)}%)`);
+        const questionTitle = document.createElement('h3');
+        questionTitle.textContent = `Pergunta ${index + 1}`;
+        div.appendChild(questionTitle);
+
+        const questionText = document.createElement('p');
+        questionText.textContent = question[1];
+        div.appendChild(questionText);
+
+        const option1 = document.createElement('input');
+        option1.type = 'radio';
+        option1.name = `question-${index}`;
+        option1.value = '0';
+        const option1Label = document.createElement('label');
+        option1Label.textContent = 'ZERO';
+        div.appendChild(option1);
+        div.appendChild(option1Label);
+
+        const option2 = document.createElement('input');
+        option2.type = 'radio';
+        option2.name = `question-${index}`;
+        option2.value = '1';
+        const option2Label = document.createElement('label');
+        option2Label.textContent = 'UM';
+        div.appendChild(option2);
+        div.appendChild(option2Label);
+
+        container.appendChild(div);
+      });
     }
 
-    // Função principal para carregar os dados e criar as divs das perguntas
-    function initializeSimulatedTest() {
-      fetch('perguntas.csv')
-        .then(response => response.text())
-        .then(csvContent => {
-          const questions = parseCSV(csvContent);
-          fetch('temas.csv')
-            .then(response => response.text())
-            .then(csvContent => {
-              const themes = parseCSV(csvContent);
-              const questionsDiv = document.getElementById('questions');
+    // Função para verificar as respostas e exibir o resultado
+    function checkAnswers() {
+      const questions = document.getElementsByClassName('question');
+      let correctCount = 0;
 
-              themes.forEach(theme => {
-                const themeDiv = document.createElement('div');
-                themeDiv.innerHTML = `<h2>${theme.descricao}</h2>`;
-                questionsDiv.appendChild(themeDiv);
+      for (let i = 0; i < questions.length; i++) {
+        const question = questions[i];
+        const selectedOption = question.querySelector('input[type="radio"]:checked');
 
-                const themeQuestions = questions.filter(question => question.tema === theme.tema);
-                themeQuestions.forEach((question, index) => {
-                  const questionDiv = createQuestionDiv(question, index);
-                  questionDiv.dataset.answer = question.resposta;
-                  themeDiv.appendChild(questionDiv);
-                });
-              });
+        if (selectedOption !== null) {
+          const questionIndex = parseInt(selectedOption.name.split('-')[1]);
+          const answer = parseInt(selectedOption.value);
+          const correctAnswer = parseInt(question.getAttribute('data-answer'));
+
+          if (answer === correctAnswer) {
+            selectedOption.parentNode.classList.add('correct');
+            correctCount++;
+          } else {
+            selectedOption.parentNode.classList.add('incorrect');
+          }
+        }
+      }
+
+      const resultMessage = document.getElementById('result-message');
+      const percentage = (correctCount / questions.length) * 100;
+      resultMessage.textContent = `Você acertou ${correctCount} de ${questions.length} (${percentage.toFixed(2)}%)`;
+    }
+
+    // Função principal para carregar os dados e iniciar a aplicação
+    function loadApplication() {
+      const promises = [
+        readCSVFile('perguntas.csv', ';'),
+        readCSVFile('temas.csv', ';')
+      ];
+
+      Promise.all(promises)
+        .then(([questionsData, themesData]) => {
+          const themesMap = new Map();
+
+          themesData.forEach(theme => {
+            const [themeId, description] = theme;
+            themesMap.set(themeId, description);
+          });
+
+          const questionsByTheme = new Map();
+
+          questionsData.forEach(question => {
+            const [themeId, questionText, answer] = question;
+
+            if (!questionsByTheme.has(themeId)) {
+              questionsByTheme.set(themeId, []);
+            }
+
+            questionsByTheme.get(themeId).push([themeId, questionText, parseInt(answer)]);
+          });
+
+          const themesContainer = document.getElementById('themes-container');
+
+          for (const [themeId, questions] of questionsByTheme) {
+            const themeDescription = themesMap.get(themeId);
+
+            const themeDiv = document.createElement('div');
+            themeDiv.textContent = themeDescription;
+            themesContainer.appendChild(themeDiv);
+
+            questions.forEach(question => {
+              questionDiv = document.createElement('div');
+              questionDiv.setAttribute('data-answer', question[2]);
+
+              const questionText = document.createElement('p');
+              questionText.textContent = question[1];
+              questionDiv.appendChild(questionText);
+
+              themesContainer.appendChild(questionDiv);
             });
+          }
+
+          displayQuestions(questionsData);
+        })
+        .catch(error => {
+          console.error('Error reading CSV file:', error);
         });
     }
 
-    // Chamada da função principal ao carregar a página
-    document.addEventListener('DOMContentLoaded', initializeSimulatedTest);
+    document.addEventListener('DOMContentLoaded', loadApplication);
   </script>
+
+  <div id="themes-container"></div>
+
+  <button onclick="checkAnswers()">Enviar</button>
+  <p id="result-message"></p>
 </body>
 </html>
