@@ -87,7 +87,8 @@
 
         const theme = document.createElement('div');
         theme.className = 'theme';
-        theme.textContent = `Tema: ${question.tema}`;
+        const themeDescription = getThemeDescription(question.tema);
+        theme.textContent = `Tema: ${themeDescription}`;
         questionElement.appendChild(theme);
 
         const questionText = document.createElement('div');
@@ -98,11 +99,11 @@
         answer.className = 'answer';
 
         const correctLabel = document.createElement('label');
-        correctLabel.innerHTML = '<input type="radio" name="answer' + index + '" value="0"> Certo';
+        correctLabel.innerHTML = `<input type="radio" name="answer${index}" value="0"> Certo`;
         answer.appendChild(correctLabel);
 
         const incorrectLabel = document.createElement('label');
-        incorrectLabel.innerHTML = '<input type="radio" name="answer' + index + '" value="1"> Errado';
+        incorrectLabel.innerHTML = `<input type="radio" name="answer${index}" value="1"> Errado`;
         answer.appendChild(incorrectLabel);
 
         questionElement.appendChild(answer);
@@ -110,16 +111,21 @@
       });
     }
 
+    // Função para obter a descrição do tema com base no número do tema
+    function getThemeDescription(themeNumber) {
+      const themes = parseCSV(localStorage.getItem('themes'));
+      const theme = themes.find(theme => theme.tema === themeNumber);
+      return theme ? theme.descricao : '';
+    }
+
     // Função para renderizar os temas
     function renderThemes(themes) {
-      const questionsContainer = document.getElementById('questions');
+      const themesData = themes.reduce((acc, theme) => {
+        acc[theme.tema] = theme.descricao;
+        return acc;
+      }, {});
 
-      themes.forEach(theme => {
-        const themeElement = document.createElement('div');
-        themeElement.className = 'theme';
-        themeElement.textContent = theme.descricao;
-        questionsContainer.appendChild(themeElement);
-      });
+      localStorage.setItem('themes', JSON.stringify(themesData));
     }
 
     // Função para calcular e exibir os resultados
@@ -130,7 +136,7 @@
       let correct = 0;
 
       for (let i = 0; i < questions.length; i++) {
-        const selectedAnswer = document.querySelector('input[name="answer' + i + '"]:checked');
+        const selectedAnswer = document.querySelector(`input[name="answer${i}"]:checked`);
         const answer = parseInt(selectedAnswer.value);
         const question = questions[i];
         const answerElement = question.getElementsByClassName('answer')[0];
