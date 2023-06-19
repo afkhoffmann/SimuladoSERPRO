@@ -131,6 +131,9 @@
 
           const questionsByTheme = new Map();
 
+          // Ignorar a primeira linha (cabeçalho) do arquivo "perguntas.csv"
+          questionsData.shift();
+
           questionsData.forEach(question => {
             const [themeId, questionText, answer] = question;
 
@@ -169,7 +172,7 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', loadApplication);
+  document.addEventListener('DOMContentLoaded', loadApplication);
   </script>
 </body>
 </html>
