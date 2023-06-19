@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simulado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .question label {
+            font-weight: bold;
+        }
+
+        .question input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        #submitButton {
+            margin-top: 20px;
+        }
+
+        #results {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simulado</h1>
+    <div id="questions"></div>
+    <button id="submitButton">Enviar</button>
+    <div id="results"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Arquivos CSV
+            var perguntasCSV = "perguntas.csv";
+            var temasCSV = "temas.csv";
+
+            // Variáveis globais
+            var perguntas = [];
+            var temas = [];
+
+            // Carrega os arquivos CSV
+            function loadCSVFiles() {
+                var perguntasRequest = new XMLHttpRequest();
+                perguntasRequest.open("GET", perguntasCSV, true);
+                perguntasRequest.onreadystatechange = function() {
+                    if (perguntasRequest.readyState === 4 && perguntasRequest.status === 200) {
+                        parsePerguntasCSV(perguntasRequest.responseText);
+                        generateQuestions();
+                    }
+                };
+                perguntasRequest.send();
+
+                var temasRequest = new XMLHttpRequest();
+                temasRequest.open("GET", temasCSV, true);
+                temasRequest.onreadystatechange = function() {
+                    if (temasRequest.readyState === 4 && temasRequest.status === 200) {
+                        parseTemasCSV(temasRequest.responseText);
+                        generateQuestions();
+                    }
+                };
+                temasRequest.send();
+            }
+
+            // Faz o parse do arquivo CSV de perguntas
+            function parsePerguntasCSV(csv) {
+                var lines = csv.split("\n");
+                var headers = lines[0].split(";");
+                for (var i = 1; i < lines.length; i++) {
+                    var obj = {};
+                    var currentLine = lines[i].split(";");
+                    for (var j = 0; j < headers.length; j++) {
+                        obj[headers[j].trim()] = currentLine[j].trim();
+                    }
+                    perguntas.push(obj);
+                }
+            }
+
+            // Faz o parse do arquivo CSV de temas
+            function parseTemasCSV(csv) {
+                var lines = csv.split("\n");
+                var headers = lines[0].split(";");
+                for (var i = 1; i < lines.length; i++) {
+                    var obj = {};
+                    var currentLine = lines[i].split(";");
+                    for (var j = 0; j < headers.length; j++) {
+                        obj[headers[j].trim()] = currentLine[j].trim();
+                    }
+                    temas.push(obj);
+                }
+            }
+
+            // Gera as questões na página
+            function generateQuestions() {
+                if (perguntas.length === 0 || temas.length === 0) {
+                    return;
+                }
+
+                var questionsDiv = document.getElementById("questions");
+                questionsDiv.innerHTML = "";
+
+                temas.forEach(function(tema) {
+                    var themeHeader = document.createElement("h2");
+                    themeHeader.textContent = tema.descricao;
+                    questionsDiv.appendChild(themeHeader);
+
+                    var themeQuestions = perguntas.filter(function(pergunta) {
+                        return pergunta.tema === tema.tema;
+                    });
+
+                    themeQuestions.forEach(function(pergunta, index) {
+                        var questionDiv = document.createElement("div");
+                        questionDiv.className = "question";
+
+                        var questionLabel = document.createElement("label");
+                        questionLabel.textContent = "Pergunta " + (index + 1) + ": " + pergunta["pergunta_" + (index + 1)];
+                        questionDiv.appendChild(questionLabel);
+
+                        var correctAnswer = pergunta["resposta_" + (index + 1)] === "0" ? "Certo" : "Errado";
+
+                        var correctLabel = document.createElement("label");
+                        var correctRadio = document.createElement("input");
+                        correctRadio.type = "radio";
+                        correctRadio.name = "pergunta_" + (index + 1);
+                        correctRadio.value = "0";
+                        correctLabel.appendChild(correctRadio);
+                        correctLabel.appendChild(document.createTextNode(correctAnswer));
+                        questionDiv.appendChild(correctLabel);
+
+                        var incorrectLabel = document.createElement("label");
+                        var incorrectRadio = document.createElement("input");
+                        incorrectRadio.type = "radio";
+                        incorrectRadio.name = "pergunta_" + (index + 1);
+                        incorrectRadio.value = "1";
+                        incorrectLabel.appendChild(incorrectRadio);
+                        incorrectLabel.appendChild(document.createTextNode(correctAnswer === "Certo" ? "Errado" : "Certo"));
+                        questionDiv.appendChild(incorrectLabel);
+
+                        questionsDiv.appendChild(questionDiv);
+                    });
+                });
+            }
+
+            // Valida as respostas e exibe os resultados
+            function showResults() {
+                var correctCount = 0;
+                var incorrectCount = 0;
+                var questions = document.querySelectorAll(".question");
+
+                questions.forEach(function(question, index) {
+                    var selectedOption = question.querySelector('input[name="pergunta_' + (index + 1) + '"]:checked');
+                    var answer = parseInt(selectedOption.value);
+                    var correctAnswer = perguntas[index]["resposta_" + (index + 1)];
+
+                    if (answer === parseInt(correctAnswer)) {
+                        selectedOption.parentNode.classList.add("correct");
+                        correctCount++;
+                    } else {
+                        selectedOption.parentNode.classList.add("incorrect");
+                        incorrectCount++;
+                    }
+                });
+
+                var resultDiv = document.getElementById("results");
+                resultDiv.innerHTML = "Total de acertos: " + correctCount + "/" + perguntas.length;
+                resultDiv.style.display = "block";
+            }
+
+            // Carrega os arquivos CSV e define os eventos
+            loadCSVFiles();
+
+            var submitButton = document.getElementById("submitButton");
+            submitButton.addEventListener("click", showResults);
+        });
+    </script>
+</body>
+</html>
