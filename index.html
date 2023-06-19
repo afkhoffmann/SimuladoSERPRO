@@ -50,35 +50,32 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Arquivos CSV
-            var perguntasCSV = "perguntas.csv";
-            var temasCSV = "temas.csv";
-
             // Variáveis globais
             var perguntas = [];
             var temas = [];
 
-            // Carrega os arquivos CSV
-            function loadCSVFiles() {
-                var perguntasRequest = new XMLHttpRequest();
-                perguntasRequest.open("GET", perguntasCSV, true);
-                perguntasRequest.onreadystatechange = function() {
-                    if (perguntasRequest.readyState === 4 && perguntasRequest.status === 200) {
-                        parsePerguntasCSV(perguntasRequest.responseText);
-                        generateQuestions();
-                    }
-                };
-                perguntasRequest.send();
+            // Função para carregar o conteúdo dos arquivos CSV
+            function getCSVFile(file) {
+                return fetch(file)
+                    .then(response => response.text())
+                    .catch(error => {
+                        console.error('Erro ao carregar o arquivo CSV:', error);
+                    });
+            }
 
-                var temasRequest = new XMLHttpRequest();
-                temasRequest.open("GET", temasCSV, true);
-                temasRequest.onreadystatechange = function() {
-                    if (temasRequest.readyState === 4 && temasRequest.status === 200) {
-                        parseTemasCSV(temasRequest.responseText);
-                        generateQuestions();
-                    }
-                };
-                temasRequest.send();
+            // Carrega os arquivos CSV
+            async function loadCSVFiles() {
+                try {
+                    var perguntasContent = await getCSVFile("perguntas.csv");
+                    parsePerguntasCSV(perguntasContent);
+
+                    var temasContent = await getCSVFile("temas.csv");
+                    parseTemasCSV(temasContent);
+
+                    generateQuestions();
+                } catch (error) {
+                    console.error('Erro ao carregar os arquivos CSV:', error);
+                }
             }
 
             // Faz o parse do arquivo CSV de perguntas
