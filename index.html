@@ -1,162 +1,134 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Simulado</title>
-  <style>
-    .question {
-      margin-bottom: 20px;
-    }
-    .theme {
-      font-weight: bold;
-      font-size: 18px;
-      margin-bottom: 10px;
-    }
-    .answer {
-      margin-top: 10px;
-    }
-    .correct {
-      color: green;
-      font-weight: bold;
-    }
-    .incorrect {
-      color: red;
-      font-weight: bold;
-    }
-    #result {
-      margin-top: 20px;
-      font-weight: bold;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Simulado</title>
+    <style>
+        .question {
+            margin-bottom: 10px;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-  <h1>Simulado</h1>
+    <h1>Simulado</h1>
 
-  <div id="questions"></div>
+    <div id="temas"></div>
 
-  <button onclick="submitAnswers()">Enviar</button>
+    <button onclick="avaliarRespostas()">Enviar</button>
 
-  <div id="result"></div>
-
-  <script>
-    // Função para ler o arquivo CSV
-    function parseCSV(csv) {
-      const lines = csv.split('\n');
-      const headers = lines[0].split(';');
-      const data = [];
-
-      for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(';');
-        const entry = {};
-
-        for (let j = 0; j < headers.length; j++) {
-          entry[headers[j]] = values[j];
+    <script>
+        // Função para ler o arquivo CSV
+        function lerArquivoCSV(nomeArquivo, callback) {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    callback(this.responseText);
+                }
+            };
+            xhttp.open("GET", nomeArquivo, true);
+            xhttp.send();
         }
 
-        data.push(entry);
-      }
+        // Função para processar os temas e perguntas
+        function processarDados(temasData, perguntasData) {
+            const temasDiv = document.getElementById("temas");
+            const temas = parseCSV(temasData);
+            const perguntas = parseCSV(perguntasData);
 
-      return data;
-    }
+            temas.forEach(function(tema) {
+                const temaDiv = document.createElement("div");
+                temaDiv.innerHTML = tema.descricao;
+                temasDiv.appendChild(temaDiv);
 
-    // Função para carregar os arquivos CSV
-    function loadCSVFiles() {
-      fetch('perguntas.csv')
-        .then(response => response.text())
-        .then(data => {
-          const questions = parseCSV(data);
-          renderQuestions(questions);
-        });
+                const perguntasDoTema = perguntas.filter(function(pergunta) {
+                    return pergunta.tema === tema.tema;
+                });
 
-      fetch('temas.csv')
-        .then(response => response.text())
-        .then(data => {
-          const themes = parseCSV(data);
-          renderThemes(themes);
-        });
-    }
+                perguntasDoTema.forEach(function(pergunta, index) {
+                    const perguntaDiv = document.createElement("div");
+                    const perguntaTitulo = document.createElement("h3");
+                    const perguntaTexto = document.createTextNode("Pergunta " + (index + 1) + ": " + pergunta.pergunta);
 
-    // Função para renderizar as perguntas
-    function renderQuestions(questions) {
-      const questionsContainer = document.getElementById('questions');
+                    perguntaTitulo.appendChild(perguntaTexto);
+                    perguntaDiv.appendChild(perguntaTitulo);
 
-      questions.forEach((question, index) => {
-        const questionNumber = index + 1;
-        const questionElement = document.createElement('div');
-        questionElement.className = 'question';
+                    const respostaZeroLabel = document.createElement("label");
+                    respostaZeroLabel.innerHTML = '<input type="radio" name="resposta' + index + '" value="0"> ZERO';
+                    perguntaDiv.appendChild(respostaZeroLabel);
 
-        const theme = document.createElement('div');
-        theme.className = 'theme';
-        const themeDescription = getThemeDescription(question.tema);
-        theme.textContent = `Tema: ${themeDescription}`;
-        questionElement.appendChild(theme);
+                    const respostaUmLabel = document.createElement("label");
+                    respostaUmLabel.innerHTML = '<input type="radio" name="resposta' + index + '" value="1"> UM';
+                    perguntaDiv.appendChild(respostaUmLabel);
 
-        const questionText = document.createElement('div');
-        questionText.textContent = `Pergunta ${questionNumber}: ${question.pergunta}`;
-        questionElement.appendChild(questionText);
-
-        const answer = document.createElement('div');
-        answer.className = 'answer';
-
-        const correctLabel = document.createElement('label');
-        correctLabel.innerHTML = `<input type="radio" name="answer${index}" value="0"> Certo`;
-        answer.appendChild(correctLabel);
-
-        const incorrectLabel = document.createElement('label');
-        incorrectLabel.innerHTML = `<input type="radio" name="answer${index}" value="1"> Errado`;
-        answer.appendChild(incorrectLabel);
-
-        questionElement.appendChild(answer);
-        questionsContainer.appendChild(questionElement);
-      });
-    }
-
-    // Função para obter a descrição do tema com base no número do tema
-    function getThemeDescription(themeNumber) {
-      const themes = parseCSV(localStorage.getItem('themes'));
-      const theme = themes.find(theme => theme.tema === themeNumber);
-      return theme ? theme.descricao : '';
-    }
-
-    // Função para renderizar os temas
-    function renderThemes(themes) {
-      const themesData = themes.reduce((acc, theme) => {
-        acc[theme.tema] = theme.descricao;
-        return acc;
-      }, {});
-
-      localStorage.setItem('themes', JSON.stringify(themesData));
-    }
-
-    // Função para calcular e exibir os resultados
-    function submitAnswers() {
-      const questions = document.getElementsByClassName('question');
-      const resultElement = document.getElementById('result');
-      let total = 0;
-      let correct = 0;
-
-      for (let i = 0; i < questions.length; i++) {
-        const selectedAnswer = document.querySelector(`input[name="answer${i}"]:checked`);
-        const answer = parseInt(selectedAnswer.value);
-        const question = questions[i];
-        const answerElement = question.getElementsByClassName('answer')[0];
-
-        if (answer === 0) {
-          answerElement.classList.add('correct');
-          correct++;
-        } else {
-          answerElement.classList.add('incorrect');
+                    temasDiv.appendChild(perguntaDiv);
+                });
+            });
         }
 
-        total++;
-      }
+        // Função para analisar as respostas
+        function avaliarRespostas() {
+            const perguntasDivs = document.querySelectorAll("#temas > div:not(:last-child)");
+            let acertos = 0;
+            let totalPerguntas = 0;
 
-      const percentage = (correct / total) * 100;
-      resultElement.textContent = `Você acertou ${correct} de ${total} (${percentage.toFixed(2)}%)`;
-    }
+            perguntasDivs.forEach(function(div) {
+                const respostas = div.getElementsByTagName("input");
 
-    // Carregar os arquivos CSV e iniciar a aplicação
-    loadCSVFiles();
-  </script>
+                Array.from(respostas).forEach(function(resposta, index) {
+                    const pergunta = div.querySelector("h3").textContent;
+                    const respostaCorreta = parseInt(resposta.value);
+                    const respostaEscolhida = parseInt(resposta.checked ? resposta.value : -1);
+
+                    totalPerguntas++;
+
+                    if (respostaEscolhida === respostaCorreta) {
+                        resposta.parentNode.classList.add("correct");
+                        acertos++;
+                    } else {
+                        resposta.parentNode.classList.add("incorrect");
+                    }
+                });
+            });
+
+            const percentualAcerto = (acertos / totalPerguntas * 100).toFixed(2);
+            const mensagem = "Você acertou " + acertos + " de " + totalPerguntas + " (" + percentualAcerto + "%)";
+            alert(mensagem);
+        }
+
+        // Função para fazer o parsing do CSV
+        function parseCSV(csvData) {
+            const lines = csvData.split("\n");
+            const headers = lines[0].split(";");
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(";");
+                const obj = {};
+
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = values[j];
+                }
+
+                data.push(obj);
+            }
+
+            return data;
+        }
+
+        // Lê os arquivos CSV e chama a função de processamento
+        lerArquivoCSV("temas.csv", function(temasData) {
+            lerArquivoCSV("perguntas.csv", function(perguntasData) {
+                processarDados(temasData, perguntasData);
+            });
+        });
+    </script>
 </body>
 </html>
