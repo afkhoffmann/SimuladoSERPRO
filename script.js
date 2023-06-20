@@ -1,59 +1,118 @@
-// carrega os arquivos csv
-window.onload = function() {
-    d3.csv('perguntas.csv').then(function(data) {
-        window.perguntas = data;
-    });
+let temas = [];
+let perguntas = [];
 
-    d3.csv('temas.csv').then(function(data) {
-        window.temas = data;
-        for (let tema of window.temas) {
-            let divTema = document.createElement('div');
-            divTema.innerHTML = '<h2>' + tema.descricao + '</h2>' + '<p>' + tema.resumo + '</p>';
-            document.getElementById('conteudo').appendChild(divTema);
+// Função para ler arquivo CSV
+async function readCSV(url) {
+    const response = await fetch(url);
+    const data = await response.text();
+    const rows = data.split('\n').slice(1);
+    return rows.map(row => row.split(';'));
+}
 
-            for (let pergunta of window.perguntas) {
-                if (pergunta.tema == tema.tema) {
-                    let divPergunta = document.createElement('div');
-                    let idPergunta = 'pergunta' + pergunta.pergunta_id;
-                    divPergunta.innerHTML = '<h3>Pergunta ' + pergunta.pergunta_id + '</h3><p>' + pergunta.pergunta + '</p><label><input type="radio" name="' + idPergunta + '" value="Certo"> Certo</label><label><input type="radio" name="' + idPergunta + '" value="Errado"> Errado</label>';
-                    divTema.appendChild(divPergunta);
-                }
-            }
-        }
+// Função para renderizar o simulado
+async function renderSimulado() {
+    temas = await readCSV('temas.csv');
+    perguntas = await readCSV('perguntas.csv');
+
+    const conteudoDiv = document.getElementById('conteudo');
+
+    // Percorrendo todos os temas e adicionando as perguntas correspondentes
+    temas.forEach((tema, temaIndex) => {
+        // Criando div do tema
+        const temaDiv = document.createElement('div');
+        const temaTitulo = document.createElement('h2');
+        temaTitulo.textContent = tema[1];
+        const temaResumo = document.createElement('p');
+        temaResumo.textContent = tema[2];
+        temaDiv.appendChild(temaTitulo);
+        temaDiv.appendChild(temaResumo);
+
+        // Adicionando perguntas correspondentes ao tema
+        perguntas
+            .filter(pergunta => pergunta[0] === tema[0])
+            .forEach((pergunta, perguntaIndex) => {
+                // Criando div da pergunta
+                const perguntaDiv = document.createElement('div');
+                const perguntaTitulo = document.createElement('h3');
+                perguntaTitulo.textContent = `Pergunta ${perguntaIndex + 1}`;
+                const perguntaTexto = document.createElement('p');
+                perguntaTexto.textContent = pergunta[1];
+
+                perguntaDiv.appendChild(perguntaTitulo);
+                perguntaDiv.appendChild(perguntaTexto);
+
+                // Criando opções de resposta
+                ['Certo', 'Errado'].forEach(opcao => {
+                    const opcaoLabel = document.createElement('label');
+                    const opcaoInput = document.createElement('input');
+                    opcaoInput.type = 'radio';
+                    opcaoInput.name = `pergunta-${temaIndex}-${perguntaIndex}`;
+                    opcaoInput.value = opcao === 'Certo' ? '1' : '0';
+                    opcaoLabel.appendChild(opcaoInput);
+                    opcaoLabel.appendChild(document.createTextNode(` ${opcao}`));
+                    perguntaDiv.appendChild(opcaoLabel);
+                });
+
+                temaDiv.appendChild(perguntaDiv);
+            });
+
+        conteudoDiv.appendChild(temaDiv);
     });
 }
 
-// função que realiza a correção
+// Função para corrigir o simulado
 function corrigir() {
-    let total = window.perguntas.length;
     let acertos = 0;
-    let elementoResultado = document.getElementById('resultado');
-    elementoResultado.innerHTML = '';
+    let total = 0;
 
-    for (let tema of window.temas) {
-        let complementoInserido = document.getElementById('complemento' + tema.tema);
-        if (!complementoInserido) {
-            let divComplemento = document.createElement('div');
-            divComplemento.id = 'complemento' + tema.tema;
-            divComplemento.innerHTML = '<p>' + tema.complemento + '</p>';
-            document.getElementById('conteudo').appendChild(divComplemento);
-        }
-    }
+    const conteudoDiv = document.getElementById('conteudo');
+    const resultadoDiv = document.getElementById('resultado');
 
-    for (let pergunta of window.perguntas) {
-        let opcaoCerta = document.querySelector('input[name="pergunta' + pergunta.pergunta_id + '"][value="' + (pergunta.resposta == 0 ? 'Errado' : 'Certo') + '"]');
-        let opcaoErrada = document.querySelector('input[name="pergunta' + pergunta.pergunta_id + '"][value="' + (pergunta.resposta == 0 ? 'Certo' : 'Errado') + '"]');
-        if (opcaoCerta.checked) {
-            acertos++;
-            opcaoCerta.parentNode.classList.remove('errado');
-            opcaoCerta.parentNode.classList.add('correto');
-        } else {
-            opcaoCerta.parentNode.classList.remove('correto');
-            opcaoCerta.parentNode.classList.add('errado');
-        }
-        opcaoCerta.parentNode.textContent = pergunta.correcao;
-        opcaoErrada.parentNode.textContent = pergunta.resposta == 0 ? 'Certo' : 'Errado';
-        opcaoErrada.parentNode.classList.remove('correto', 'errado');
-    }
-    elementoResultado.innerHTML = 'Você acertou ' + acertos + ' de ' + total + ' (' + ((acertos / total) * 100).toFixed(2) + '%)';
+    // Removendo classes de correção anterior
+    [...document.getElementsByTagName('label')].forEach(label => {
+        label.classList.remove('correto');
+        label.classList.remove('errado');
+    });
+
+    // Removendo textos de complemento anterior
+    [...document.getElementsByClassName('complemento')].forEach(complemento => {
+        complemento.remove();
+    });
+
+    // Percorrendo temas e suas perguntas
+    temas.forEach((tema, temaIndex) => {
+        const perguntasTema = perguntas.filter(pergunta => pergunta[0] === tema[0]);
+
+        perguntasTema.forEach((pergunta, perguntaIndex) => {
+            const resposta = document.querySelector(`input[name="pergunta-${temaIndex}-${perguntaIndex}"]:checked`);
+
+            if (resposta) {
+                const correto = resposta.value === pergunta[2];
+
+                if (correto) {
+                    acertos++;
+                    resposta.parentNode.classList.add('correto');
+                } else {
+                    resposta.parentNode.classList.add('errado');
+                }
+
+                // Substituindo texto da opção de resposta pela correção
+                resposta.parentNode.childNodes[1].textContent = ` ${pergunta[3]}`;
+                total++;
+            }
+        });
+
+        // Adicionando texto de complemento
+        const temaDiv = conteudoDiv.children[temaIndex];
+        const complementoParagrafo = document.createElement('p');
+        complementoParagrafo.textContent = tema[3];
+        complementoParagrafo.className = 'complemento';
+        temaDiv.appendChild(complementoParagrafo);
+    });
+
+    resultadoDiv.textContent = `Você acertou ${acertos} de ${total} (${(acertos / total * 100).toFixed(2)}%)`;
+    resultadoDiv.style.textAlign = "center";
 }
+
+// Chamando a função para renderizar o simulado
+renderSimulado();
