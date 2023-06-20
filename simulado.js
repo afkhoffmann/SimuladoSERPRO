@@ -61,87 +61,107 @@ function CSVToArray(strData, strDelimiter) {
     return arrData;
 }
 
-function exibirPerguntas(temas, perguntas) {
-    const conteudo = document.getElementById('conteudo');
-    conteudo.innerHTML = '';
+function exibirPerguntas() {
+    let conteudo = document.getElementById("conteudo");
+    conteudo.innerHTML = "";
 
-    temas.forEach(tema => {
-        const divTema = document.createElement('div');
-        const h2 = document.createElement('h2');
+    temas.forEach((tema, i) => {
+        let divTema = document.createElement("div");
+        let h2 = document.createElement("h2");
         h2.textContent = tema.descricao;
-
-        const pResumo = document.createElement('p');
-        pResumo.textContent = tema.resumo;
-
         divTema.appendChild(h2);
+
+        let pResumo = document.createElement("p");
+        pResumo.textContent = tema.resumo;
         divTema.appendChild(pResumo);
-        
-        const pComplemento = document.createElement('p');
-        divTema.appendChild(pComplemento);
 
-        perguntas.filter(p => p.tema == tema.tema).forEach((pergunta, index) => {
-            const divPergunta = document.createElement('div');
-            const h3 = document.createElement('h3');
-            h3.textContent = 'Pergunta ' + (index + 1);
-            divPergunta.appendChild(h3);
+        perguntas
+            .filter(pergunta => pergunta.tema === tema.tema)
+            .forEach((pergunta, j) => {
+                let divPergunta = document.createElement("div");
+                let h3 = document.createElement("h3");
+                h3.textContent = "Pergunta " + (j + 1);
+                divPergunta.appendChild(h3);
 
-            const pPergunta = document.createElement('p');
-            pPergunta.textContent = pergunta.pergunta;
-            divPergunta.appendChild(pPergunta);
+                let pPergunta = document.createElement("p");
+                pPergunta.textContent = pergunta.pergunta;
+                divPergunta.appendChild(pPergunta);
 
-            ['Certo', 'Errado'].forEach((opcao, i) => {
-                const input = document.createElement('input');
-                input.type = 'radio';
-                input.name = 'pergunta' + pergunta.pergunta;
-                input.value = i;
-                divPergunta.appendChild(input);
+                let labelCerto = document.createElement("label");
+                let radioCerto = document.createElement("input");
+                radioCerto.type = "radio";
+                radioCerto.name = "pergunta_" + i + "_" + j;
+                radioCerto.value = "1";
+                labelCerto.appendChild(radioCerto);
+                labelCerto.innerHTML += "Certo";
+                divPergunta.appendChild(labelCerto);
 
-                const label = document.createElement('label');
-                label.textContent = opcao;
-                divPergunta.appendChild(label);
+                let labelErrado = document.createElement("label");
+                let radioErrado = document.createElement("input");
+                radioErrado.type = "radio";
+                radioErrado.name = "pergunta_" + i + "_" + j;
+                radioErrado.value = "0";
+                labelErrado.appendChild(radioErrado);
+                labelErrado.innerHTML += "Errado";
+                divPergunta.appendChild(labelErrado);
+
+                divTema.appendChild(divPergunta);
             });
-
-            divTema.appendChild(divPergunta);
-        });
 
         conteudo.appendChild(divTema);
     });
 }
 
 function corrigir() {
-    const temas = carregarCSV('temas.csv', ['tema', 'descricao', 'resumo', 'complemento']);
-    const perguntas = carregarCSV('perguntas.csv', ['tema', 'pergunta', 'resposta', 'correcao']);
-    let corretas = 0;
+    let total = 0;
+    let acertos = 0;
+    document.getElementById("resultado").textContent = "";
 
-    temas.forEach((tema, tIndex) => {
-        perguntas.filter(p => p.tema == tema.tema).forEach((pergunta, pIndex) => {
-            const divPergunta = document.getElementById('conteudo').children[tIndex].children[pIndex + 2];
-            const inputs = divPergunta.getElementsByTagName('input');
-            const labels = divPergunta.getElementsByTagName('label');
-            for(let i = 0; i < inputs.length; i++) {
-                inputs[i].parentElement.classList.remove('correto', 'errado');
-                if(inputs[i].checked) {
-                    if(inputs[i].value == pergunta.resposta) {
-                        labels[i].textContent = labels[i].textContent.split(". ")[0] + ". " + perguntas.correcao;
-                        labels[i].parentElement.classList.add('correto');
-                        corretas++;
+    temas.forEach((tema, i) => {
+        let divTema = document.getElementById("conteudo").children[i];
+        let pComplemento = document.createElement("p");
+        pComplemento.textContent = tema.complemento;
+        divTema.appendChild(pComplemento);
+
+        perguntas
+            .filter(pergunta => pergunta.tema === tema.tema)
+            .forEach((pergunta, j) => {
+                total++;
+                let divPergunta = divTema.children[j + 2]; // +2 to skip the h2 and p elements
+                let labelCerto = divPergunta.children[2];
+                let labelErrado = divPergunta.children[3];
+                let radioCerto = labelCerto.children[0];
+                let radioErrado = labelErrado.children[0];
+
+                radioCerto.checked ? labelCerto.classList.remove("errado") : labelCerto.classList.remove("correto");
+                radioErrado.checked ? labelErrado.classList.remove("errado") : labelErrado.classList.remove("correto");
+
+                if (pergunta.resposta === 1) {
+                    labelCerto.textContent = "Certo. " + pergunta.correcao;
+                    if (radioCerto.checked) {
+                        acertos++;
+                        labelCerto.classList.add("correto");
                     } else {
-                        labels[i].textContent = labels[i].textContent.split(". ")[0] + ". " + perguntas.correcao;
-                        labels[i].parentElement.classList.add('errado');
+                        labelCerto.classList.add("errado");
+                    }
+                } else {
+                    labelErrado.textContent = "Errado. " + pergunta.correcao;
+                    if (radioErrado.checked) {
+                        acertos++;
+                        labelErrado.classList.add("correto");
+                    } else {
+                        labelErrado.classList.add("errado");
                     }
                 }
-            }
-        });
-
-        const pComplemento = document.getElementById('conteudo').children[tIndex].children[2 + perguntas.filter(p => p.tema == tema.tema).length];
-        pComplemento.textContent = tema.complemento;
+            });
     });
 
-    document.getElementById('resultado').textContent = `Você acertou ${corretas} de ${perguntas.length} (${(corretas/perguntas.length*100).toFixed(2)}%)`;
+    document.getElementById("resultado").textContent =
+        "Você acertou " +
+        acertos +
+        " de " +
+        total +
+        " (" +
+        ((acertos / total) * 100).toFixed(2) +
+        "%)";
 }
-
-window.onload = () => {
-    const temas = carregarCSV('temas.csv', ['tema', 'descricao', 'resumo', 'complemento']);
-    const perguntas = carregarCSV('perguntas.csv', ['tema', 'pergunta', 'resposta', 'correcao']);
-    exibirPerguntas(temas, perguntas);
-};
