@@ -75,7 +75,7 @@ async function corrigir() {
                         cor = "correto";
                         acertos++;
                     }
-                    radio.nextSibling.textContent = radio.value == 0 ? "Certo. " + perguntasTema[i].correcao : "Errado";
+                    radio.nextSibling.textContent = radio.value == 0 ? "Certo. " + perguntasTema[i].correcao : "Errado. " + perguntasTema[i].correcao;
                     radio.parentNode.className = cor;
                 }
             }
