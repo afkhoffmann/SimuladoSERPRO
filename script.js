@@ -1,12 +1,3 @@
-let perguntas = [];
-let temas = [];
-
-function carregarCSV(nomeArquivo) {
-    return fetch(nomeArquivo)
-        .then(response => response.text())
-        .then(texto => Papa.parse(texto, { header: true, delimiter: ";" }).data);
-}
-
 async function carregarDados() {
     perguntas = await carregarCSV("perguntas.csv");
     temas = await carregarCSV("temas.csv");
@@ -44,13 +35,10 @@ async function carregarDados() {
 
                 let span = document.createElement("span");
                 span.textContent = opcao == 0 ? "Certo" : "Errado";
+                span.dataset.originalText = span.textContent;  // Armazenamos o texto original aqui.
                 label.appendChild(span);
                 divPergunta.appendChild(label);
             }
-
-            let pCorrecao = document.createElement("p");
-            pCorrecao.textContent = "";
-            divPergunta.appendChild(pCorrecao);
 
             divTema.appendChild(divPergunta);
         }
@@ -79,15 +67,16 @@ function corrigir() {
                         cor = "correto";
                         acertos++;
                     }
-                    let pCorrecao = radio.parentNode.parentNode.lastChild;
-                    pCorrecao.textContent = (radio.value == 0 ? "Certo. " : "Errado. ") + perguntasTema[i].correcao;
+                    radio.nextSibling.textContent = radio.nextSibling.dataset.originalText + ". " + (radio.value == 0 ? perguntasTema[i].correcao : "");  // Usamos o texto original aqui.
                     radio.parentNode.className = cor;
                 }
             }
         }
 
         let pComplemento = document.getElementById("conteudo").children[tema.tema-1].lastChild;
-        pComplemento.textContent = tema.complemento || "";
+        if (pComplemento.textContent == "") {
+            pComplemento.textContent = tema.complemento || "";
+        }
     }
 
     document.getElementById("resultado").textContent = `Você acertou ${acertos} de ${total} (${(acertos / total * 100).toFixed(2)}%)`;

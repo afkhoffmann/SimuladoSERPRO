@@ -27,13 +27,13 @@ button {
     transition: all 0.3s ease;
 }
 
-button:hover {
+button:active {
     background-color: #5EB2FF;
     color: white;
     border-color: #5EB2FF;
 }
 
-button:active {
+button:hover {
     background-color: #DBE0E5;
     color: #5EB2FF;
 }
