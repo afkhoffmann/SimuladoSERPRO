@@ -1,89 +1,59 @@
-let perguntas = [];
-let temas = [];
+// carrega os arquivos csv
+window.onload = function() {
+    d3.csv('perguntas.csv').then(function(data) {
+        window.perguntas = data;
+    });
 
-async function carregarCSV(nomeArquivo) {
-    let response = await fetch(nomeArquivo);
-    let texto = await response.text();
-    return Papa.parse(texto, { header: true, delimiter: ";" }).data;
-}
+    d3.csv('temas.csv').then(function(data) {
+        window.temas = data;
+        for (let tema of window.temas) {
+            let divTema = document.createElement('div');
+            divTema.innerHTML = '<h2>' + tema.descricao + '</h2>' + '<p>' + tema.resumo + '</p>';
+            document.getElementById('conteudo').appendChild(divTema);
 
-async function carregarDados() {
-    perguntas = await carregarCSV("perguntas.csv");
-    temas = await carregarCSV("temas.csv");
-
-    for (let tema of temas) {
-        let divTema = document.createElement("div");
-        let h2 = document.createElement("h2");
-        h2.textContent = tema.descricao;
-        divTema.appendChild(h2);
-
-        let pResumo = document.createElement("p");
-        pResumo.textContent = tema.resumo || "";
-        divTema.appendChild(pResumo);
-
-        let perguntasTema = perguntas.filter(p => p.tema == tema.tema);
-
-        for (let i = 0; i < perguntasTema.length; i++) {
-            let divPergunta = document.createElement("div");
-
-            let h3 = document.createElement("h3");
-            h3.textContent = "Pergunta " + (i + 1);
-            divPergunta.appendChild(h3);
-
-            let pPergunta = document.createElement("p");
-            pPergunta.textContent = perguntasTema[i].pergunta;
-            divPergunta.appendChild(pPergunta);
-
-            for (let opcao = 0; opcao < 2; opcao++) {
-                let label = document.createElement("label");
-                let radio = document.createElement("input");
-                radio.type = "radio";
-                radio.name = "pergunta" + perguntasTema[i].tema + i;
-                radio.value = opcao;
-                label.appendChild(radio);
-
-                let span = document.createElement("span");
-                span.textContent = opcao == 0 ? "Certo" : "Errado";
-                label.appendChild(span);
-                divPergunta.appendChild(label);
-            }
-
-            divTema.appendChild(divPergunta);
-        }
-
-        let pComplemento = document.createElement("p");
-        pComplemento.textContent = "";
-        divTema.appendChild(pComplemento);
-
-        document.getElementById("conteudo").appendChild(divTema);
-    }
-}
-
-async function corrigir() {
-    let acertos = 0;
-    let total = perguntas.length;
-
-    for (let tema of temas) {
-        let perguntasTema = perguntas.filter(p => p.tema == tema.tema);
-        for (let i = 0; i < perguntasTema.length; i++) {
-            let radios = document.getElementsByName("pergunta" + perguntasTema[i].tema + i);
-            let cor = "errado";
-            for (let radio of radios) {
-                radio.parentNode.className = "";
-                if (radio.checked) {
-                    if (radio.value == perguntasTema[i].resposta) {
-                        cor = "correto";
-                        acertos++;
-                    }
-                    radio.nextSibling.textContent = radio.value == 0 ? "Certo. " + perguntasTema[i].correcao : "Errado. " + perguntasTema[i].correcao;
-                    radio.parentNode.className = cor;
+            for (let pergunta of window.perguntas) {
+                if (pergunta.tema == tema.tema) {
+                    let divPergunta = document.createElement('div');
+                    let idPergunta = 'pergunta' + pergunta.pergunta_id;
+                    divPergunta.innerHTML = '<h3>Pergunta ' + pergunta.pergunta_id + '</h3><p>' + pergunta.pergunta + '</p><label><input type="radio" name="' + idPergunta + '" value="Certo"> Certo</label><label><input type="radio" name="' + idPergunta + '" value="Errado"> Errado</label>';
+                    divTema.appendChild(divPergunta);
                 }
             }
         }
-        document.getElementById("conteudo").children[tema.tema-1].lastChild.textContent = tema.complemento || "";
-    }
-
-    document.getElementById("resultado").textContent = `Você acertou ${acertos} de ${total} (${(acertos / total * 100).toFixed(2)}%)`;
+    });
 }
 
-carregarDados();
+// função que realiza a correção
+function corrigir() {
+    let total = window.perguntas.length;
+    let acertos = 0;
+    let elementoResultado = document.getElementById('resultado');
+    elementoResultado.innerHTML = '';
+
+    for (let tema of window.temas) {
+        let complementoInserido = document.getElementById('complemento' + tema.tema);
+        if (!complementoInserido) {
+            let divComplemento = document.createElement('div');
+            divComplemento.id = 'complemento' + tema.tema;
+            divComplemento.innerHTML = '<p>' + tema.complemento + '</p>';
+            document.getElementById('conteudo').appendChild(divComplemento);
+        }
+    }
+
+    for (let pergunta of window.perguntas) {
+        let opcaoCerta = document.querySelector('input[name="pergunta' + pergunta.pergunta_id + '"][value="' + (pergunta.resposta == 0 ? 'Errado' : 'Certo') + '"]');
+        let opcaoErrada = document.querySelector('input[name="pergunta' + pergunta.pergunta_id + '"][value="' + (pergunta.resposta == 0 ? 'Certo' : 'Errado') + '"]');
+        if (opcaoCerta.checked) {
+            acertos++;
+            opcaoCerta.parentNode.classList.remove('errado');
+            opcaoCerta.parentNode.classList.add('correto');
+        } else {
+            opcaoCerta.parentNode.classList.remove('correto');
+            opcaoCerta.parentNode.classList.add('errado');
+        }
+        opcaoCerta.parentNode.textContent = pergunta.correcao;
+        opcaoErrada.parentNode.textContent = pergunta.resposta == 0 ? 'Certo' : 'Errado';
+        opcaoErrada.parentNode.classList.remove('correto', 'errado');
+    }
+    elementoResultado.innerHTML = 'Você acertou ' + acertos + ' de ' + total + ' (' + ((acertos / total) * 100).toFixed(2) + '%)';
+}
