@@ -1,167 +1,167 @@
-let temas = null;
-let perguntas = null;
-
-fetch("temas.csv")
-    .then(response => response.text())
-    .then(data => {
-        temas = CSVToArray(data, ";").map(tema => {
-            return {
-                tema: Number(tema[0]),
-                descricao: tema[1],
-                resumo: tema[2],
-                complemento: tema[3],
-            };
-        });
-
-        fetch("perguntas.csv")
-            .then(response => response.text())
-            .then(data => {
-                perguntas = CSVToArray(data, ";").map(pergunta => {
-                    return {
-                        tema: Number(pergunta[0]),
-                        pergunta: pergunta[1],
-                        resposta: Number(pergunta[2]),
-                        correcao: pergunta[3],
-                    };
-                });
-                
-                exibirPerguntas();
-            });
-    });
-
-function CSVToArray(strData, strDelimiter) {
-    strDelimiter = strDelimiter || ",";
-    let objPattern = new RegExp(
-        "(\\" +
-            strDelimiter +
-            "|\\r?\\n|\\r|^)" +
-            '(?:"([^"]*(?:""[^"]*)*)"|' +
-            '([^"\\' +
-            strDelimiter +
-            "\\r\\n]*))",
-        "gi"
-    );
-    let arrData = [[]];
-    let arrMatches = null;
-    while ((arrMatches = objPattern.exec(strData))) {
-        let strMatchedDelimiter = arrMatches[1];
-        if (
-            strMatchedDelimiter.length &&
-            strMatchedDelimiter !== strDelimiter
-        ) {
-            arrData.push([]);
-        }
-        if (arrMatches[2]) {
-            var strMatchedValue = arrMatches[2].replace(new RegExp('""', "g"), '"');
-        } else {
-            var strMatchedValue = arrMatches[3];
-        }
-        arrData[arrData.length - 1].push(strMatchedValue);
-    }
-    return arrData;
-}
-
-function exibirPerguntas() {
-    let conteudo = document.getElementById("conteudo");
-    conteudo.innerHTML = "";
-
-    temas.forEach((tema, i) => {
-        let divTema = document.createElement("div");
-        let h2 = document.createElement("h2");
-        h2.textContent = tema.descricao;
-        divTema.appendChild(h2);
-
-        let pResumo = document.createElement("p");
-        pResumo.textContent = tema.resumo;
-        divTema.appendChild(pResumo);
-
-        perguntas
-            .filter(pergunta => pergunta.tema === tema.tema)
-            .forEach((pergunta, j) => {
-                let divPergunta = document.createElement("div");
-                let h3 = document.createElement("h3");
-                h3.textContent = "Pergunta " + (j + 1);
-                divPergunta.appendChild(h3);
-
-                let pPergunta = document.createElement("p");
-                pPergunta.textContent = pergunta.pergunta;
-                divPergunta.appendChild(pPergunta);
-
-                let labelCerto = document.createElement("label");
-                let radioCerto = document.createElement("input");
-                radioCerto.type = "radio";
-                radioCerto.name = "pergunta_" + i + "_" + j;
-                radioCerto.value = "1";
-                labelCerto.appendChild(radioCerto);
-                labelCerto.innerHTML += "Certo";
-                divPergunta.appendChild(labelCerto);
-
-                let labelErrado = document.createElement("label");
-                let radioErrado = document.createElement("input");
-                radioErrado.type = "radio";
-                radioErrado.name = "pergunta_" + i + "_" + j;
-                radioErrado.value = "0";
-                labelErrado.appendChild(radioErrado);
-                labelErrado.innerHTML += "Errado";
-                divPergunta.appendChild(labelErrado);
-
-                divTema.appendChild(divPergunta);
-            });
-
-        conteudo.appendChild(divTema);
-    });
-}
-
-function corrigir() {
-    let total = 0;
-    let acertos = 0;
-    document.getElementById("resultado").textContent = "";
-
-    temas.forEach((tema, i) => {
-        let divTema = document.getElementById("conteudo").children[i];
-        let pComplemento = document.createElement("p");
-        pComplemento.textContent = tema.complemento;
-        divTema.appendChild(pComplemento);
-
-        perguntas
-            .filter(pergunta => pergunta.tema === tema.tema)
-            .forEach((pergunta, j) => {
-                total++;
-                let divPergunta = divTema.children[j + 2]; // +2 to skip the h2 and p elements
-                let labelCerto = divPergunta.children[2];
-                let labelErrado = divPergunta.children[3];
-                let radioCerto = labelCerto.children[0];
-                let radioErrado = labelErrado.children[0];
-
-                radioCerto.checked ? labelCerto.classList.remove("errado") : labelCerto.classList.remove("correto");
-                radioErrado.checked ? labelErrado.classList.remove("errado") : labelErrado.classList.remove("correto");
-
-                if (pergunta.resposta === 1) {
-                    labelCerto.textContent = "Certo. " + pergunta.correcao;
-                    if (radioCerto.checked) {
-                        acertos++;
-                        labelCerto.classList.add("correto");
-                    } else {
-                        labelCerto.classList.add("errado");
-                    }
-                } else {
-                    labelErrado.textContent = "Errado. " + pergunta.correcao;
-                    if (radioErrado.checked) {
-                        acertos++;
-                        labelErrado.classList.add("correto");
-                    } else {
-                        labelErrado.classList.add("errado");
-                    }
-                }
-            });
-    });
-
-    document.getElementById("resultado").textContent =
-        "Você acertou " +
-        acertos +
-        " de " +
-        total +
-        " (" +
-        ((acertos / total) * 100).toFixed(2) +
-        "%)";
-}
+let temas = [
+    { tema: '1', descricao: 'Animais', resumo: 'Tema sobre animais', complemento: 'Isso é tudo sobre animais.' },
+    { tema: '2', descricao: 'Objetos', resumo: 'Tema sobre objetos', complemento: 'Isso é tudo sobre objetos.' },
+    { tema: '3', descricao: 'Pessoas', resumo: 'Tema sobre pessoas', complemento: 'Isso é tudo sobre pessoas.' },
+    { tema: '4', descricao: 'Lugares', resumo: 'Tema sobre lugares', complemento: 'Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.' }
+  ];
+  
+  let perguntas = [
+    { tema: '1', pergunta: 'T1 P1?', resposta: '0', correcao: 'Explicação para T1 P1'},
+    { tema: '1', pergunta: 'T1 P2?', resposta: '1', correcao: 'Explicação para T1 P2'},
+    { tema: '2', pergunta: 'T2 P1?', resposta: '0', correcao: 'Explicação para T2 P1'},
+    { tema: '3', pergunta: 'T3 P1?', resposta: '0', correcao: 'Explicação para T3 P1'},
+    { tema: '3', pergunta: 'T3 P2?', resposta: '0', correcao: 'Explicação para T3 P2'},
+    { tema: '3', pergunta: 'T3 P3?', resposta: '1', correcao: 'Explicação para T3 P3'},
+    { tema: '3', pergunta: 'T3 P4?', resposta: '1', correcao: 'Explicação para T3 P4'},
+    { tema: '4', pergunta: 'T4 P1?', resposta: '0', correcao: 'Explicação para T4 P1'},
+    { tema: '4', pergunta: 'T4 P2?', resposta: '0', correcao: 'Explicação para T4 P2'},
+    { tema: '4', pergunta: 'T4 P3?', resposta: '1', correcao: 'Explicação para T4 P3'}
+  ];
+  
+  
+  let ultimoScroll = 0;
+  
+  window.onload = function() {
+      carregarPerguntas();
+  
+      let cabecalho = document.getElementById('cabecalho');
+      let btnTopo = document.getElementById('btnTopo'); // botão de rolar para o topo
+      let lastScrollTop = 0;
+  
+      window.addEventListener('scroll', function() {
+          let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          if (scrollTop > lastScrollTop && scrollTop > cabecalho.offsetHeight) {
+              // Ao rolar para baixo e estar abaixo da altura do cabeçalho, esconda-o e mostre o botão
+              if (!cabecalho.classList.contains('header-hide')) {
+                  cabecalho.classList.add('header-hide');
+                  btnTopo.style.display = 'block';  // mostrar o botão de rolar para o topo
+              }
+          } else {
+              // Ao rolar para cima, mostre o cabeçalho
+              if (cabecalho.classList.contains('header-hide')) {
+                  cabecalho.classList.remove('header-hide');
+              }
+          }
+          
+          // Se estiver no topo da página, esconda o botão de rolar para o topo
+          if (scrollTop === 0) {
+              btnTopo.style.display = 'none';
+          }
+  
+          lastScrollTop = scrollTop;
+      });
+  };
+  
+  function carregarPerguntas() {
+      let divConteudo = document.getElementById('conteudo');
+      let indexPerguntaLoad = 0;
+  
+      temas.forEach((tema, i) => {
+          let divTema = document.createElement('div');
+  
+          divTema.innerHTML = `<h2>${tema.descricao}</h2><p>${tema.resumo}</p>`;
+          divConteudo.appendChild(divTema);
+  
+          let perguntasDoTema = perguntas.filter(pergunta => pergunta.tema === tema.tema);
+  
+          perguntasDoTema.forEach((pergunta, j) => {
+              let divPergunta = document.createElement('div');
+              divPergunta.innerHTML = 
+                  `<h3>Pergunta ${indexPerguntaLoad + 1}</h3>
+                  <p>${pergunta.pergunta}</p>
+                  <label class="pergunta_${indexPerguntaLoad}">
+                      <input type="radio" name="resposta_${indexPerguntaLoad}" value="0"> Certo
+                  </label>
+                  <label class="pergunta_${indexPerguntaLoad}">
+                      <input type="radio" name="resposta_${indexPerguntaLoad}" value="1"> Errado
+                  </label>
+                  <div id="correcao_${indexPerguntaLoad}" class="correcao"></div>`;
+              divTema.appendChild(divPergunta);
+              indexPerguntaLoad++;
+          });
+  
+          divTema.innerHTML += `<p class="paragrafo-complementar"></p>`;
+      });
+  }
+  
+  function corrigir() {
+      let totalPerguntas = perguntas.length;
+      let totalCorretas = 0;
+      let semResposta = false;
+      let resultado = document.getElementById("resultado");
+      let containerResultado = document.getElementById("container-resultado"); // Obtenha a div do container de resultado
+  
+      containerResultado.style.display = "flex"; // Torna a div visível quando a função corrigir() é acionada
+      // Primeiro removemos a animação atual se houver uma.
+      resultado.style.animation = 'none';
+      // Forçamos o navegador a "reflow" o elemento, para que possamos aplicar a animação novamente.
+      // Isto é um pouco de uma solução alternativa, mas funciona.
+      resultado.offsetHeight; // Provoca o reflow
+      resultado.style.animation = "blink 1s ease-in-out 2"; // Aplicamos a animação novamente
+  
+      perguntas.forEach((pergunta, i) => {
+          let radioName = 'resposta_' + i;
+          let respostaEscolhida = document.querySelector('input[name="' + radioName + '"]:checked');
+  
+          if (!respostaEscolhida) {
+              semResposta = true;
+          }
+      });
+  
+      if (semResposta === true) {
+          resultado.innerHTML = "Existem perguntas não respondidas.";
+          // Rolar a página até o elemento do resultado
+          containerResultado.scrollIntoView({ behavior: 'smooth' });
+          return;
+      }
+  
+      let indexPerguntaCheck = 0;
+  
+      temas.forEach((tema, j) => {
+          const pComplemento = document.getElementById('conteudo').children[j].lastElementChild;
+          pComplemento.style.display = 'block';
+          pComplemento.textContent = tema.complemento;
+  
+          perguntas.filter(pergunta => pergunta.tema === tema.tema).forEach((pergunta, i) => {
+              let radioName = 'resposta_' + indexPerguntaCheck;
+              let respostaEscolhida = document.querySelector('input[name="' + radioName + '"]:checked');
+              let labels = document.querySelectorAll('.pergunta_' + indexPerguntaCheck);
+  
+              labels.forEach(label => {
+                  label.classList.remove('correto');
+                  label.classList.remove('errado');
+              });
+  
+              let correcao = document.getElementById('correcao_' + indexPerguntaCheck);
+  
+              if (respostaEscolhida.value === pergunta.resposta) {
+                  respostaEscolhida.parentNode.classList.add("correto");
+                  correcao.style.display = 'none';
+                  totalCorretas++;
+              } else {
+                  respostaEscolhida.parentNode.classList.add("errado");
+                  correcao.textContent = pergunta.correcao;  // Coloca a correção no div
+                  correcao.style.display = 'block';  // Torna a correção visível
+              }
+  
+              indexPerguntaCheck++;
+          });
+      });
+  
+      resultado.innerHTML =
+      "Você acertou " +
+      totalCorretas +
+      " de " +
+      totalPerguntas +
+      " (" +
+      ((totalCorretas / totalPerguntas) * 100).toFixed(2) +
+      "%)";
+  
+      // Rolar a página até o elemento do resultado
+      containerResultado.scrollIntoView({ behavior: 'smooth' });
+  }
+  
+  // Função para rolar a página para o topo
+  function rolarParaTopo() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  }

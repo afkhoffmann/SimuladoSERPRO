@@ -6,13 +6,18 @@
     <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Simulado</h1>
+    <header id="cabecalho">
+        <h1>📚 Simulado SERPRO</h1>
         <button id="corrigir" onclick="corrigir()">Enviar</button>
     </header>
 
     <div id="conteudo"></div>
-    <div id="resultado"></div>
+    <div id="container-resultado">
+        <div id="resultado"></div>
+    </div>
+
+    <!-- Botão de rolar para cima -->
+    <button id="btnTopo" onclick="rolarParaTopo()">↑</button>
 
     <script src="simulado.js"></script>
 </body>
