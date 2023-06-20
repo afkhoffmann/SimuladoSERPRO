@@ -1,3 +1,66 @@
+let temas = null;
+let perguntas = null;
+
+fetch("temas.csv")
+    .then(response => response.text())
+    .then(data => {
+        temas = CSVToArray(data, ";").map(tema => {
+            return {
+                tema: Number(tema[0]),
+                descricao: tema[1],
+                resumo: tema[2],
+                complemento: tema[3],
+            };
+        });
+
+        fetch("perguntas.csv")
+            .then(response => response.text())
+            .then(data => {
+                perguntas = CSVToArray(data, ";").map(pergunta => {
+                    return {
+                        tema: Number(pergunta[0]),
+                        pergunta: pergunta[1],
+                        resposta: Number(pergunta[2]),
+                        correcao: pergunta[3],
+                    };
+                });
+                
+                exibirPerguntas();
+            });
+    });
+
+function CSVToArray(strData, strDelimiter) {
+    strDelimiter = strDelimiter || ",";
+    let objPattern = new RegExp(
+        "(\\" +
+            strDelimiter +
+            "|\\r?\\n|\\r|^)" +
+            '(?:"([^"]*(?:""[^"]*)*)"|' +
+            '([^"\\' +
+            strDelimiter +
+            "\\r\\n]*))",
+        "gi"
+    );
+    let arrData = [[]];
+    let arrMatches = null;
+    while ((arrMatches = objPattern.exec(strData))) {
+        let strMatchedDelimiter = arrMatches[1];
+        if (
+            strMatchedDelimiter.length &&
+            strMatchedDelimiter !== strDelimiter
+        ) {
+            arrData.push([]);
+        }
+        if (arrMatches[2]) {
+            var strMatchedValue = arrMatches[2].replace(new RegExp('""', "g"), '"');
+        } else {
+            var strMatchedValue = arrMatches[3];
+        }
+        arrData[arrData.length - 1].push(strMatchedValue);
+    }
+    return arrData;
+}
+
 function exibirPerguntas(temas, perguntas) {
     const conteudo = document.getElementById('conteudo');
     conteudo.innerHTML = '';
