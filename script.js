@@ -48,6 +48,10 @@ async function carregarDados() {
                 divPergunta.appendChild(label);
             }
 
+            let pCorrecao = document.createElement("p");
+            pCorrecao.textContent = "";
+            divPergunta.appendChild(pCorrecao);
+
             divTema.appendChild(divPergunta);
         }
 
@@ -75,14 +79,15 @@ function corrigir() {
                         cor = "correto";
                         acertos++;
                     }
-                    radio.nextSibling.textContent += ". " + (radio.value == 0 ? perguntasTema[i].correcao : "");
+                    let pCorrecao = radio.parentNode.parentNode.lastChild;
+                    pCorrecao.textContent = (radio.value == 0 ? "Certo. " : "Errado. ") + perguntasTema[i].correcao;
                     radio.parentNode.className = cor;
                 }
             }
         }
 
-        let pComplemento = tema.complemento || "";
-        document.getElementById("conteudo").children[tema.tema-1].lastChild.textContent = pComplemento;
+        let pComplemento = document.getElementById("conteudo").children[tema.tema-1].lastChild;
+        pComplemento.textContent = tema.complemento || "";
     }
 
     document.getElementById("resultado").textContent = `Você acertou ${acertos} de ${total} (${(acertos / total * 100).toFixed(2)}%)`;
