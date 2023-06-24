@@ -24,6 +24,7 @@ window.rolarParaTopo = function rolarParaTopo() {
 
 window.onload = function() {
     carregarPerguntas();
+
     let cabecalho = document.getElementById('cabecalho');
     let btnTopo = document.getElementById('btnTopo'); 
     let lastScrollTop = 0;
@@ -63,19 +64,21 @@ function carregarPerguntas() {
 
         questoesDoTema.forEach((questao, j) => {
             let divQuestao = document.createElement('div');
-            divQuestao.innerHTML = `<h3>Q${indexPerguntaLoad + 1}: ${questao.questao}</h3>
-                <input type="radio" name="resposta_${indexPerguntaLoad}" value="0"> 
-                <label for="resposta_${indexPerguntaLoad}">Verdadeiro</label><br>
-                <input type="radio" name="resposta_${indexPerguntaLoad}" value="1"> 
-                <label for="resposta_${indexPerguntaLoad}">Falso</label><br>`;
-
+            divQuestao.innerHTML = 
+                `<h3>Pergunta ${indexPerguntaLoad + 1}</h3>
+                <p>${questao.questao}</p>
+                <label class="questao_${indexPerguntaLoad}">
+                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=0> Certo
+                </label>
+                <label class="questao_${indexPerguntaLoad}">
+                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=1> Errado
+                </label>
+                <div id="correcao_${indexPerguntaLoad}" class="correcao"></div>`;
             divTema.appendChild(divQuestao);
             indexPerguntaLoad++;
         });
 
-        let pComplemento = document.createElement('p');
-        pComplemento.style.display = 'none';
-        divTema.appendChild(pComplemento);
+        divTema.innerHTML += `<p class="paragrafo-complementar"></p>`;
     });
 }
 
@@ -97,11 +100,6 @@ function corrigir() {
 
         if (!respostaEscolhida) {
             semResposta = true;
-        } else if (parseInt(respostaEscolhida.value) === questao.resposta) {
-            totalCorretas++;
-            document.querySelector(`input[name="${radioName}"][value="${questao.resposta}"]`).nextElementSibling.style.fontWeight = 'bold';
-        } else {
-            document.querySelector(`input[name="${radioName}"][value="${questao.resposta}"]`).nextElementSibling.style.fontWeight = 'normal';
         }
     });
 
@@ -111,6 +109,43 @@ function corrigir() {
         return;
     }
 
-    resultado.innerHTML = `Você acertou ${totalCorretas} de ${totalQuestoes} perguntas.`;
+    let indexQuestaoCheck = 0;
+
+    temas.forEach((tema, j) => {
+        const pComplemento = document.getElementById('conteudo').children[j].lastElementChild;
+        pComplemento.style.display = 'block';
+        pComplemento.textContent = tema.complemento;
+
+        questoes.filter(questao => questao.tema === tema.tema).forEach((questao, i) => {
+            let radioName = 'resposta_' + indexQuestaoCheck;
+            let respostaEscolhida = document.querySelector('input[name="' + radioName + '"]:checked');
+            let labels = document.querySelectorAll('.questao_' + indexQuestaoCheck);
+
+            labels.forEach(label => {
+                label.classList.remove('correto');
+                label.classList.remove('errado');
+            });
+
+            if (parseInt(respostaEscolhida.value, 10) === questao.resposta) {
+                respostaEscolhida.parentNode.classList.add("correto");
+                totalCorretas++;
+            } else {
+                respostaEscolhida.parentNode.classList.add("errado");
+            }
+
+            indexQuestaoCheck++;
+        });
+    });
+
+    resultado.innerHTML =
+    "Você acertou " +
+    totalCorretas +
+    " de " +
+    totalQuestoes +
+    " perguntas. " +
+    "Porcentagem de acertos: " +
+    ((totalCorretas / totalQuestoes) * 100).toFixed(2) +
+    "%.";
+
     containerResultado.scrollIntoView({ behavior: 'smooth' });
 }
