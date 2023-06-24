@@ -152,3 +152,8 @@ function corrigir() {
 
     containerResultado.scrollIntoView({ behavior: 'smooth' });
 }
+
+// Função para rolar a página para o topo
+function rolarParaTopo() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
