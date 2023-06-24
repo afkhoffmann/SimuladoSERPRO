@@ -57,13 +57,17 @@ function carregarPerguntas() {
     temas.forEach((tema, i) => {
         let divTema = document.createElement('div');
 
-        let divBarra = document.createElement('div');  // Cria uma nova div para a barra
-        divBarra.style.backgroundColor = tema.cor;     // A cor de fundo da barra é a cor do tema
-        divBarra.style.color = '#FFFFFF';              // A cor do texto na barra é branca
-        divBarra.style.padding = '5px';                // Adiciona um pequeno preenchimento para o texto
-        divBarra.textContent = tema.categoria;         // O texto da barra é a categoria do tema
+        let divBarra = document.createElement('div');  
+        divBarra.style.backgroundColor = tema.cor; 
+        divBarra.style.color = '#FFFFFF'; 
+        divBarra.style.padding = '5px';  
+        divBarra.style.margin = '0'; // remove as margens
+        divBarra.textContent = tema.categoria; 
 
-        divTema.appendChild(divBarra);  // Adiciona a barra à div do tema
+        divTema.appendChild(divBarra);
+
+        // remove as margens da primeira tag h2 dentro de divTema
+        divTema.style.marginTop = '0';
 
         divTema.innerHTML += `<h2>${tema.descricao}</h2><p>${tema.resumo}</p>`;
         divConteudo.appendChild(divTema);
