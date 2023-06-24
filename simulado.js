@@ -18,7 +18,10 @@ let questoes = [
     { tema: 4, pergunta: 'T4 P3?', resposta: 1, correcao: 'Explicação para T4 P3'}
 ];
 
-let ultimoScroll = 0;
+// let ultimoScroll = 0;
+window.rolarParaTopo = function rolarParaTopo() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 
 window.onload = function() {
     carregarPerguntas();
@@ -26,8 +29,6 @@ window.onload = function() {
     let cabecalho = document.getElementById('cabecalho');
     let btnTopo = document.getElementById('btnTopo'); 
     let lastScrollTop = 0;
-
-    btnTopo.addEventListener('click', rolarParaTopo);
 
     window.addEventListener('scroll', function() {
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -153,9 +154,4 @@ function corrigir() {
     "%.";
 
     containerResultado.scrollIntoView({ behavior: 'smooth' });
-}
-
-// Função para rolar a página para o topo
-function rolarParaTopo() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
