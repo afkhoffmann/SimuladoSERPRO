@@ -6,26 +6,24 @@ let temas = [
 ];
 
 let questoes = [
-    { tema: 1, pergunta: 'T1 P1?', resposta: 0, correcao: 'Explicação para T1 P1'},
-    { tema: 1, pergunta: 'T1 P2?', resposta: 1, correcao: 'Explicação para T1 P2'},
-    { tema: 2, pergunta: 'T2 P1?', resposta: 0, correcao: 'Explicação para T2 P1'},
-    { tema: 3, pergunta: 'T3 P1?', resposta: 0, correcao: 'Explicação para T3 P1'},
-    { tema: 3, pergunta: 'T3 P2?', resposta: 0, correcao: 'Explicação para T3 P2'},
-    { tema: 3, pergunta: 'T3 P3?', resposta: 1, correcao: 'Explicação para T3 P3'},
-    { tema: 3, pergunta: 'T3 P4?', resposta: 1, correcao: 'Explicação para T3 P4'},
-    { tema: 4, pergunta: 'T4 P1?', resposta: 0, correcao: 'Explicação para T4 P1'},
-    { tema: 4, pergunta: 'T4 P2?', resposta: 0, correcao: 'Explicação para T4 P2'},
-    { tema: 4, pergunta: 'T4 P3?', resposta: 1, correcao: 'Explicação para T4 P3'}
+    { tema: 1, questao: 'T1 P1?', resposta: 0 },
+    { tema: 1, questao: 'T1 P2?', resposta: 1 },
+    { tema: 2, questao: 'T2 P1?', resposta: 0 },
+    { tema: 3, questao: 'T3 P1?', resposta: 0 },
+    { tema: 3, questao: 'T3 P2?', resposta: 0 },
+    { tema: 3, questao: 'T3 P3?', resposta: 1 },
+    { tema: 3, questao: 'T3 P4?', resposta: 1 },
+    { tema: 4, questao: 'T4 P1?', resposta: 0 },
+    { tema: 4, questao: 'T4 P2?', resposta: 0 },
+    { tema: 4, questao: 'T4 P3?', resposta: 1 }
 ];
 
-// let ultimoScroll = 0;
 window.rolarParaTopo = function rolarParaTopo() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 window.onload = function() {
     carregarPerguntas();
-
     let cabecalho = document.getElementById('cabecalho');
     let btnTopo = document.getElementById('btnTopo'); 
     let lastScrollTop = 0;
@@ -66,20 +64,19 @@ function carregarPerguntas() {
         questoesDoTema.forEach((questao, j) => {
             let divQuestao = document.createElement('div');
             divQuestao.innerHTML = 
-                `<h3>Pergunta ${indexPerguntaLoad + 1}</h3>
-                <p>${questao.pergunta}</p>
-                <label class="questao_${indexPerguntaLoad}">
-                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=0> Certo
-                </label>
-                <label class="questao_${indexPerguntaLoad}">
-                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=1> Errado
-                </label>
-                <div id="correcao_${indexPerguntaLoad}" class="correcao"></div>`;
+                `<h3>Pergunta ${indexPerguntaLoad + 1}: ${questao.questao}</h3>
+                 <input type="radio" name="resposta_${indexPerguntaLoad}" value="0"> 
+                 <label for="resposta_${indexPerguntaLoad}">Verdadeiro</label><br>
+                 <input type="radio" name="resposta_${indexPerguntaLoad}" value="1"> 
+                 <label for="resposta_${indexPerguntaLoad}">Falso</label><br>`;
+
             divTema.appendChild(divQuestao);
             indexPerguntaLoad++;
         });
 
-        divTema.innerHTML += `<p class="paragrafo-complementar"></p>`;
+        let pComplemento = document.createElement('p');
+        pComplemento.style.display = 'none';
+        divTema.appendChild(pComplemento);
     });
 }
 
@@ -101,6 +98,9 @@ function corrigir() {
 
         if (!respostaEscolhida) {
             semResposta = true;
+        } else if (parseInt(respostaEscolhida.value) === questao.resposta) {
+            totalCorretas++;
+            document.querySelector(`input[name="${radioName}"][value="${questao.resposta}"]`).nextElementSibling.style.fontWeight = 'bold';
         }
     });
 
@@ -110,48 +110,6 @@ function corrigir() {
         return;
     }
 
-    let indexQuestaoCheck = 0;
-
-    temas.forEach((tema, j) => {
-        const pComplemento = document.getElementById('conteudo').children[j].lastElementChild;
-        pComplemento.style.display = 'block';
-        pComplemento.textContent = tema.complemento;
-
-        questoes.filter(questao => questao.tema === tema.tema).forEach((questao, i) => {
-            let radioName = 'resposta_' + indexQuestaoCheck;
-            let respostaEscolhida = document.querySelector('input[name="' + radioName + '"]:checked');
-            let labels = document.querySelectorAll('.questao_' + indexQuestaoCheck);
-
-            labels.forEach(label => {
-                label.classList.remove('correto');
-                label.classList.remove('errado');
-            });
-
-            let correcao = document.getElementById('correcao_' + indexQuestaoCheck);
-
-            if (parseInt(respostaEscolhida.value, 10) === questao.resposta) {
-                respostaEscolhida.parentNode.classList.add("correto");
-                correcao.style.display = 'none';
-                totalCorretas++;
-            } else {
-                respostaEscolhida.parentNode.classList.add("errado");
-                correcao.textContent = questao.correcao;
-                correcao.style.display = 'block';
-            }
-
-            indexQuestaoCheck++;
-        });
-    });
-
-    resultado.innerHTML =
-    "Você acertou " +
-    totalCorretas +
-    " de " +
-    totalQuestoes +
-    " perguntas. " +
-    "Porcentagem de acertos: " +
-    ((totalCorretas / totalQuestoes) * 100).toFixed(2) +
-    "%.";
-
+    resultado.innerHTML = `Você acertou ${totalCorretas} de ${totalQuestoes} perguntas.`;
     containerResultado.scrollIntoView({ behavior: 'smooth' });
 }
