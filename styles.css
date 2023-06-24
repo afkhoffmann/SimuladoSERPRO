@@ -78,7 +78,7 @@ button:active {
 
 #conteudo > div {
     background-color: white;
-    border: 1px solid #e8e8e8;
+    /* border: 1px solid #e8e8e8; */
     border-radius: 8px;
     margin-bottom: 20px;
     padding: 20px;
@@ -124,6 +124,11 @@ p {
 
 .correto {
     color: #5cb85c;
+    font-weight: bold;
+}
+
+.gabarito {
+    color: #444;
     font-weight: bold;
 }
 

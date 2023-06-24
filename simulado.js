@@ -59,13 +59,16 @@ function carregarPerguntas() {
         divTema.style.display = 'flex';
         divTema.style.flexDirection = 'column';
         divTema.style.justifyContent = 'flex-start';
+        divTema.style.border = `1px solid ${tema.cor}`;
 
         let divBarra = document.createElement('div'); 
-        divBarra.style.backgroundColor = tema.cor;
+        divBarra.style.padding = '0px 0px 2px 5px'; // Ajuste no valor do padding
+        divBarra.style.borderRadius = '8px 8px 0 0'; 
+        divBarra.style.margin = '-20px -20px 5px'; // Adiciona margens negativas para compensar o padding do tema
+        divBarra.style.backgroundImage = `linear-gradient(to bottom, ${tema.cor} 20%, ${tema.cor} 80%, transparent 100%)`;
         divBarra.style.color = '#FFFFFF';
-        divBarra.style.padding = '5px';
-        divBarra.style.borderRadius = '8px 8px 0 0'; // Adiciona o mesmo border-radius das divs de tema, mas apenas para as bordas superiores
         divBarra.textContent = tema.categoria;
+        divBarra.style.height = '130%';
 
         divTema.appendChild(divBarra);
 
@@ -144,6 +147,12 @@ function corrigir() {
                 respostaEscolhida.parentNode.classList.add("errado");
             }
 
+            labels.forEach(opcao => {
+                if (!(parseInt(respostaEscolhida.value, 10) === questao.resposta) && (!opcao.classList.contains('errado') && !opcao.classList.contains('correto'))) {
+                    opcao.classList.add('gabarito');
+                }
+            });
+            
             indexQuestaoCheck++;
         });
     });
