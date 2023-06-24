@@ -56,18 +56,18 @@ function carregarPerguntas() {
 
     temas.forEach((tema, i) => {
         let divTema = document.createElement('div');
+        divTema.style.display = 'flex';
+        divTema.style.flexDirection = 'column';
+        divTema.style.justifyContent = 'flex-start';
 
-        let divBarra = document.createElement('div');  
-        divBarra.style.backgroundColor = tema.cor; 
-        divBarra.style.color = '#FFFFFF'; 
-        divBarra.style.padding = '5px';  
-        divBarra.style.margin = '0'; // remove as margens
-        divBarra.textContent = tema.categoria; 
+        let divBarra = document.createElement('div'); 
+        divBarra.style.backgroundColor = tema.cor;
+        divBarra.style.color = '#FFFFFF';
+        divBarra.style.padding = '5px';
+        divBarra.style.borderRadius = '8px 8px 0 0'; // Adiciona o mesmo border-radius das divs de tema, mas apenas para as bordas superiores
+        divBarra.textContent = tema.categoria;
 
         divTema.appendChild(divBarra);
-
-        // remove as margens da primeira tag h2 dentro de divTema
-        divTema.style.marginTop = '0';
 
         divTema.innerHTML += `<h2>${tema.descricao}</h2><p>${tema.resumo}</p>`;
         divConteudo.appendChild(divTema);
