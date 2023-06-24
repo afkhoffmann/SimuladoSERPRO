@@ -63,12 +63,11 @@ function carregarPerguntas() {
 
         questoesDoTema.forEach((questao, j) => {
             let divQuestao = document.createElement('div');
-            divQuestao.innerHTML = 
-                `<h3>Pergunta ${indexPerguntaLoad + 1}: ${questao.questao}</h3>
-                 <input type="radio" name="resposta_${indexPerguntaLoad}" value="0"> 
-                 <label for="resposta_${indexPerguntaLoad}">Verdadeiro</label><br>
-                 <input type="radio" name="resposta_${indexPerguntaLoad}" value="1"> 
-                 <label for="resposta_${indexPerguntaLoad}">Falso</label><br>`;
+            divQuestao.innerHTML = `<h3>Q${indexPerguntaLoad + 1}: ${questao.questao}</h3>
+                <input type="radio" name="resposta_${indexPerguntaLoad}" value="0"> 
+                <label for="resposta_${indexPerguntaLoad}">Verdadeiro</label><br>
+                <input type="radio" name="resposta_${indexPerguntaLoad}" value="1"> 
+                <label for="resposta_${indexPerguntaLoad}">Falso</label><br>`;
 
             divTema.appendChild(divQuestao);
             indexPerguntaLoad++;
@@ -101,6 +100,8 @@ function corrigir() {
         } else if (parseInt(respostaEscolhida.value) === questao.resposta) {
             totalCorretas++;
             document.querySelector(`input[name="${radioName}"][value="${questao.resposta}"]`).nextElementSibling.style.fontWeight = 'bold';
+        } else {
+            document.querySelector(`input[name="${radioName}"][value="${questao.resposta}"]`).nextElementSibling.style.fontWeight = 'normal';
         }
     });
 
