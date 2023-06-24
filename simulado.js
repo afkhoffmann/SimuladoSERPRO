@@ -1,21 +1,21 @@
 let temas = [
-    { tema: '1', descricao: 'Animais', resumo: 'Tema sobre animais', complemento: 'Isso é tudo sobre animais.' },
-    { tema: '2', descricao: 'Objetos', resumo: 'Tema sobre objetos', complemento: 'Isso é tudo sobre objetos.' },
-    { tema: '3', descricao: 'Pessoas', resumo: 'Tema sobre pessoas', complemento: 'Isso é tudo sobre pessoas.' },
-    { tema: '4', descricao: 'Lugares', resumo: 'Tema sobre lugares', complemento: 'Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.' }
+    { tema: 1, descricao: 'Animais', resumo: 'Tema sobre animais', complemento: 'Isso é tudo sobre animais.' },
+    { tema: 2, descricao: 'Objetos', resumo: 'Tema sobre objetos', complemento: 'Isso é tudo sobre objetos.' },
+    { tema: 3, descricao: 'Pessoas', resumo: 'Tema sobre pessoas', complemento: 'Isso é tudo sobre pessoas.' },
+    { tema: 4, descricao: 'Lugares', resumo: 'Tema sobre lugares', complemento: 'Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.' }
   ];
   
   let perguntas = [
-    { tema: '1', pergunta: 'T1 P1?', resposta: '0', correcao: 'Explicação para T1 P1'},
-    { tema: '1', pergunta: 'T1 P2?', resposta: '1', correcao: 'Explicação para T1 P2'},
-    { tema: '2', pergunta: 'T2 P1?', resposta: '0', correcao: 'Explicação para T2 P1'},
-    { tema: '3', pergunta: 'T3 P1?', resposta: '0', correcao: 'Explicação para T3 P1'},
-    { tema: '3', pergunta: 'T3 P2?', resposta: '0', correcao: 'Explicação para T3 P2'},
-    { tema: '3', pergunta: 'T3 P3?', resposta: '1', correcao: 'Explicação para T3 P3'},
-    { tema: '3', pergunta: 'T3 P4?', resposta: '1', correcao: 'Explicação para T3 P4'},
-    { tema: '4', pergunta: 'T4 P1?', resposta: '0', correcao: 'Explicação para T4 P1'},
-    { tema: '4', pergunta: 'T4 P2?', resposta: '0', correcao: 'Explicação para T4 P2'},
-    { tema: '4', pergunta: 'T4 P3?', resposta: '1', correcao: 'Explicação para T4 P3'}
+    { tema: 1, pergunta: 'T1 P1?', resposta: 0, correcao: 'Explicação para T1 P1'},
+    { tema: 1, pergunta: 'T1 P2?', resposta: 1, correcao: 'Explicação para T1 P2'},
+    { tema: 2, pergunta: 'T2 P1?', resposta: 0, correcao: 'Explicação para T2 P1'},
+    { tema: 3, pergunta: 'T3 P1?', resposta: 0, correcao: 'Explicação para T3 P1'},
+    { tema: 3, pergunta: 'T3 P2?', resposta: 0, correcao: 'Explicação para T3 P2'},
+    { tema: 3, pergunta: 'T3 P3?', resposta: 1, correcao: 'Explicação para T3 P3'},
+    { tema: 3, pergunta: 'T3 P4?', resposta: 1, correcao: 'Explicação para T3 P4'},
+    { tema: 4, pergunta: 'T4 P1?', resposta: 0, correcao: 'Explicação para T4 P1'},
+    { tema: 4, pergunta: 'T4 P2?', resposta: 0, correcao: 'Explicação para T4 P2'},
+    { tema: 4, pergunta: 'T4 P3?', resposta: 1, correcao: 'Explicação para T4 P3'}
   ];
   
   
@@ -70,10 +70,10 @@ let temas = [
                   `<h3>Pergunta ${indexPerguntaLoad + 1}</h3>
                   <p>${pergunta.pergunta}</p>
                   <label class="pergunta_${indexPerguntaLoad}">
-                      <input type="radio" name="resposta_${indexPerguntaLoad}" value="0"> Certo
+                      <input type="radio" name="resposta_${indexPerguntaLoad}" value=0> Certo
                   </label>
                   <label class="pergunta_${indexPerguntaLoad}">
-                      <input type="radio" name="resposta_${indexPerguntaLoad}" value="1"> Errado
+                      <input type="radio" name="resposta_${indexPerguntaLoad}" value=1> Errado
                   </label>
                   <div id="correcao_${indexPerguntaLoad}" class="correcao"></div>`;
               divTema.appendChild(divPergunta);
