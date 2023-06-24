@@ -1,8 +1,8 @@
 let temas = [
-    { tema: 1, descricao: 'Animais', resumo: 'Tema sobre animais', complemento: 'Isso é tudo sobre animais.', cor: '#FF875E' },
-    { tema: 2, descricao: 'Objetos', resumo: 'Tema sobre objetos', complemento: 'Isso é tudo sobre objetos.', cor: '#FFD65E' },
-    { tema: 3, descricao: 'Pessoas', resumo: 'Tema sobre pessoas', complemento: 'Isso é tudo sobre pessoas.', cor: '#5EFFD6' },
-    { tema: 4, descricao: 'Lugares', resumo: 'Tema sobre lugares', complemento: 'Isso é tudo sobre lugares.', cor: '#FF5EB2' }
+    { tema: 1, descricao: 'Animais', resumo: 'Tema sobre animais', complemento: 'Isso é tudo sobre animais.', cor: '#FF875E', 'categoria': 'Animalia' },
+    { tema: 2, descricao: 'Objetos', resumo: 'Tema sobre objetos', complemento: 'Isso é tudo sobre objetos.', cor: '#FFD65E', 'categoria': 'Coisas' },
+    { tema: 3, descricao: 'Pessoas', resumo: 'Tema sobre pessoas', complemento: 'Isso é tudo sobre pessoas.', cor: '#5EFFD6', 'categoria': 'Humanos' },
+    { tema: 4, descricao: 'Lugares', resumo: 'Tema sobre lugares', complemento: 'Isso é tudo sobre lugares.', cor: '#FF5EB2', 'categoria': 'Geografia' }
 ];
 
 let questoes = [
@@ -56,10 +56,16 @@ function carregarPerguntas() {
 
     temas.forEach((tema, i) => {
         let divTema = document.createElement('div');
+        let divBarraSuperior = document.createElement('div');
 
-        divTema.style.borderTop = `3px solid ${tema.cor}`;  // Adiciona uma barra superior com a cor do tema
+        divBarraSuperior.style.backgroundColor = tema.cor;
+        divBarraSuperior.style.color = 'white';
+        divBarraSuperior.style.padding = '5px';
+        divBarraSuperior.textContent = tema.categoria;
 
-        divTema.innerHTML = `<h2>${tema.descricao}</h2><p>${tema.resumo}</p>`;
+        divTema.appendChild(divBarraSuperior);
+        
+        divTema.innerHTML += `<h2>${tema.descricao}</h2><p>${tema.resumo}</p>`;
         divConteudo.appendChild(divTema);
 
         let questoesDoTema = questoes.filter(questao => questao.tema === tema.tema);
