@@ -1,8 +1,8 @@
 let temas = [
-    { tema: 1, descricao: 'Animais', resumo: 'Tema sobre animais', complemento: 'Isso é tudo sobre animais.' },
-    { tema: 2, descricao: 'Objetos', resumo: 'Tema sobre objetos', complemento: 'Isso é tudo sobre objetos.' },
-    { tema: 3, descricao: 'Pessoas', resumo: 'Tema sobre pessoas', complemento: 'Isso é tudo sobre pessoas.' },
-    { tema: 4, descricao: 'Lugares', resumo: 'Tema sobre lugares', complemento: 'Isso é tudo sobre lugares.' }
+    { tema: 1, descricao: 'Animais', resumo: 'Tema sobre animais', complemento: 'Isso é tudo sobre animais.', cor: '#FF875E' },
+    { tema: 2, descricao: 'Objetos', resumo: 'Tema sobre objetos', complemento: 'Isso é tudo sobre objetos.', cor: '#FFD65E' },
+    { tema: 3, descricao: 'Pessoas', resumo: 'Tema sobre pessoas', complemento: 'Isso é tudo sobre pessoas.', cor: '#5EFFD6' },
+    { tema: 4, descricao: 'Lugares', resumo: 'Tema sobre lugares', complemento: 'Isso é tudo sobre lugares.', cor: '#FF5EB2' }
 ];
 
 let questoes = [
@@ -57,6 +57,8 @@ function carregarPerguntas() {
     temas.forEach((tema, i) => {
         let divTema = document.createElement('div');
 
+        divTema.style.borderTop = `3px solid ${tema.cor}`;  // Adiciona uma barra superior com a cor do tema
+
         divTema.innerHTML = `<h2>${tema.descricao}</h2><p>${tema.resumo}</p>`;
         divConteudo.appendChild(divTema);
 
@@ -72,8 +74,7 @@ function carregarPerguntas() {
                 </label>
                 <label class="questao_${indexPerguntaLoad}">
                     <input type="radio" name="resposta_${indexPerguntaLoad}" value=1> Errado
-                </label>
-                <div id="correcao_${indexPerguntaLoad}" class="correcao"></div>`;
+                </label>`;
             divTema.appendChild(divQuestao);
             indexPerguntaLoad++;
         });
