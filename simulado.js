@@ -2,10 +2,10 @@ let temas = [
     { tema: 1, descricao: 'Animais', resumo: 'Tema sobre animais', complemento: 'Isso é tudo sobre animais.' },
     { tema: 2, descricao: 'Objetos', resumo: 'Tema sobre objetos', complemento: 'Isso é tudo sobre objetos.' },
     { tema: 3, descricao: 'Pessoas', resumo: 'Tema sobre pessoas', complemento: 'Isso é tudo sobre pessoas.' },
-    { tema: 4, descricao: 'Lugares', resumo: 'Tema sobre lugares', complemento: 'Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.' }
+    { tema: 4, descricao: 'Lugares', resumo: 'Tema sobre lugares', complemento: 'Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.Isso é tudo sobre lugares.' }
   ];
   
-  let perguntas = [
+  let questoes = [
     { tema: 1, pergunta: 'T1 P1?', resposta: 0, correcao: 'Explicação para T1 P1'},
     { tema: 1, pergunta: 'T1 P2?', resposta: 1, correcao: 'Explicação para T1 P2'},
     { tema: 2, pergunta: 'T2 P1?', resposta: 0, correcao: 'Explicação para T2 P1'},
@@ -62,21 +62,21 @@ let temas = [
           divTema.innerHTML = `<h2>${tema.descricao}</h2><p>${tema.resumo}</p>`;
           divConteudo.appendChild(divTema);
   
-          let perguntasDoTema = perguntas.filter(pergunta => pergunta.tema === tema.tema);
+          let questoesDoTema = questoes.filter(questao => questao.tema === tema.tema);
   
-          perguntasDoTema.forEach((pergunta, j) => {
-              let divPergunta = document.createElement('div');
-              divPergunta.innerHTML = 
-                  `<h3>Pergunta ${indexPerguntaLoad + 1}</h3>
-                  <p>${pergunta.pergunta}</p>
-                  <label class="pergunta_${indexPerguntaLoad}">
-                      <input type="radio" name="resposta_${indexPerguntaLoad}" value=0> Certo
+          questoesDoTema.forEach((questao, j) => {
+              let divQuestao = document.createElement('div');
+              divQuestao.innerHTML = 
+                  `<h3>Questão ${indexPerguntaLoad + 1}</h3>
+                  <p>${questao.pergunta}</p>
+                  <label class="questao_${indexPerguntaLoad}">
+                      <input type="radio" name="resposta_${indexPerguntaLoad}" value="0"> Certo
                   </label>
-                  <label class="pergunta_${indexPerguntaLoad}">
-                      <input type="radio" name="resposta_${indexPerguntaLoad}" value=1> Errado
+                  <label class="questao_${indexPerguntaLoad}">
+                      <input type="radio" name="resposta_${indexPerguntaLoad}" value="1"> Errado
                   </label>
                   <div id="correcao_${indexPerguntaLoad}" class="correcao"></div>`;
-              divTema.appendChild(divPergunta);
+              divTema.appendChild(divQuestao);
               indexPerguntaLoad++;
           });
   
@@ -85,7 +85,7 @@ let temas = [
   }
   
   function corrigir() {
-      let totalPerguntas = perguntas.length;
+      let totalQuestoes = questoes.length;
       let totalCorretas = 0;
       let semResposta = false;
       let resultado = document.getElementById("resultado");
@@ -99,7 +99,7 @@ let temas = [
       resultado.offsetHeight; // Provoca o reflow
       resultado.style.animation = "blink 1s ease-in-out 2"; // Aplicamos a animação novamente
   
-      perguntas.forEach((pergunta, i) => {
+      questoes.forEach((questao, i) => {
           let radioName = 'resposta_' + i;
           let respostaEscolhida = document.querySelector('input[name="' + radioName + '"]:checked');
   
@@ -109,42 +109,42 @@ let temas = [
       });
   
       if (semResposta === true) {
-          resultado.innerHTML = "Existem perguntas não respondidas.";
+          resultado.innerHTML = "Existem questões não respondidas.";
           // Rolar a página até o elemento do resultado
           containerResultado.scrollIntoView({ behavior: 'smooth' });
           return;
       }
   
-      let indexPerguntaCheck = 0;
+      let indexQuestaoCheck = 0;
   
       temas.forEach((tema, j) => {
           const pComplemento = document.getElementById('conteudo').children[j].lastElementChild;
           pComplemento.style.display = 'block';
           pComplemento.textContent = tema.complemento;
   
-          perguntas.filter(pergunta => pergunta.tema === tema.tema).forEach((pergunta, i) => {
-              let radioName = 'resposta_' + indexPerguntaCheck;
+          questoes.filter(questao => questao.tema === tema.tema).forEach((questao, i) => {
+              let radioName = 'resposta_' + indexQuestaoCheck;
               let respostaEscolhida = document.querySelector('input[name="' + radioName + '"]:checked');
-              let labels = document.querySelectorAll('.pergunta_' + indexPerguntaCheck);
+              let labels = document.querySelectorAll('.questao_' + indexQuestaoCheck);
   
               labels.forEach(label => {
                   label.classList.remove('correto');
                   label.classList.remove('errado');
               });
   
-              let correcao = document.getElementById('correcao_' + indexPerguntaCheck);
+              let correcao = document.getElementById('correcao_' + indexQuestaoCheck);
   
-              if (respostaEscolhida.value === pergunta.resposta) {
+              if (respostaEscolhida.value === questao.resposta.toString()) {
                   respostaEscolhida.parentNode.classList.add("correto");
                   correcao.style.display = 'none';
                   totalCorretas++;
               } else {
                   respostaEscolhida.parentNode.classList.add("errado");
-                  correcao.textContent = pergunta.correcao;  // Coloca a correção no div
+                  correcao.textContent = questao.correcao;  // Coloca a correção no div
                   correcao.style.display = 'block';  // Torna a correção visível
               }
   
-              indexPerguntaCheck++;
+              indexQuestaoCheck++;
           });
       });
   
@@ -152,9 +152,9 @@ let temas = [
       "Você acertou " +
       totalCorretas +
       " de " +
-      totalPerguntas +
+      totalQuestoes +
       " (" +
-      ((totalCorretas / totalPerguntas) * 100).toFixed(2) +
+      ((totalCorretas / totalQuestoes) * 100).toFixed(2) +
       "%)";
   
       // Rolar a página até o elemento do resultado
@@ -164,4 +164,4 @@ let temas = [
   // Função para rolar a página para o topo
   function rolarParaTopo() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  }  
