@@ -27,6 +27,8 @@ window.onload = function() {
     let btnTopo = document.getElementById('btnTopo'); 
     let lastScrollTop = 0;
 
+    btnTopo.addEventListener('click', rolarParaTopo);
+
     window.addEventListener('scroll', function() {
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         if (scrollTop > lastScrollTop && scrollTop > cabecalho.offsetHeight) {
