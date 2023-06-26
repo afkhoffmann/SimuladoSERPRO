@@ -59,7 +59,7 @@ function carregarPerguntas() {
         divTema.style.display = 'flex';
         divTema.style.flexDirection = 'column';
         divTema.style.justifyContent = 'flex-start';
-        divTema.style.border = `1px solid ${tema.cor}`;
+        divTema.style.borderTop = `2px solid ${tema.cor}`;
 
         let divBarra = document.createElement('div'); 
         divBarra.style.padding = '0px 0px 2px 5px'; // Ajuste no valor do padding
@@ -67,6 +67,8 @@ function carregarPerguntas() {
         divBarra.style.margin = '-20px -20px 5px'; // Adiciona margens negativas para compensar o padding do tema
         divBarra.style.backgroundImage = `linear-gradient(to bottom, ${tema.cor} 20%, ${tema.cor} 80%, transparent 100%)`;
         divBarra.style.color = '#FFFFFF';
+        // divBarra.style.color = '#666';
+        divBarra.style.fontSize = '0.8em';
         divBarra.textContent = tema.categoria;
         divBarra.style.height = '130%';
 
