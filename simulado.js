@@ -6,16 +6,16 @@ let temas = [
 ];
 
 let questoes = [
-    { tema: 1, questao: 'T1 P1?', resposta: 0 },
-    { tema: 1, questao: 'T1 P2?', resposta: 1 },
-    { tema: 2, questao: 'T2 P1?', resposta: 0 },
-    { tema: 3, questao: 'T3 P1?', resposta: 0 },
-    { tema: 3, questao: 'T3 P2?', resposta: 0 },
-    { tema: 3, questao: 'T3 P3?', resposta: 1 },
-    { tema: 3, questao: 'T3 P4?', resposta: 1 },
-    { tema: 4, questao: 'T4 P1?', resposta: 0 },
-    { tema: 4, questao: 'T4 P2?', resposta: 0 },
-    { tema: 4, questao: 'T4 P3?', resposta: 1 }
+    { tema: 1, questao: 'T1 P1?', resposta: 1 },
+    { tema: 1, questao: 'T1 P2?', resposta: 0 },
+    { tema: 2, questao: 'T2 P1?', resposta: 1 },
+    { tema: 3, questao: 'T3 P1?', resposta: 1 },
+    { tema: 3, questao: 'T3 P2?', resposta: 1 },
+    { tema: 3, questao: 'T3 P3?', resposta: 0 },
+    { tema: 3, questao: 'T3 P4?', resposta: 0 },
+    { tema: 4, questao: 'T4 P1?', resposta: 1 },
+    { tema: 4, questao: 'T4 P2?', resposta: 1 },
+    { tema: 4, questao: 'T4 P3?', resposta: 0 }
 ];
 
 window.rolarParaTopo = function rolarParaTopo() {
@@ -85,10 +85,10 @@ function carregarPerguntas() {
                 `<h3>Pergunta ${indexPerguntaLoad + 1}</h3>
                 <p>${questao.questao}</p>
                 <label class="questao_${indexPerguntaLoad}">
-                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=0> Certo
+                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=0> Errado
                 </label>
                 <label class="questao_${indexPerguntaLoad}">
-                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=1> Errado
+                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=1> Certo
                 </label>`;
             divTema.appendChild(divQuestao);
             indexPerguntaLoad++;
