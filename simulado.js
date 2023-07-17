@@ -85,10 +85,10 @@ function carregarPerguntas() {
                 `<h3>Pergunta ${indexPerguntaLoad + 1}</h3>
                 <p>${questao.questao}</p>
                 <label class="questao_${indexPerguntaLoad}">
-                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=0> Errado
+                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=1> Certo
                 </label>
                 <label class="questao_${indexPerguntaLoad}">
-                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=1> Certo
+                    <input type="radio" name="resposta_${indexPerguntaLoad}" value=0> Errado
                 </label>`;
             divTema.appendChild(divQuestao);
             indexPerguntaLoad++;
